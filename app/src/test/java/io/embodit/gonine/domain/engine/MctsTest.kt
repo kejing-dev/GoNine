@@ -44,7 +44,8 @@ class MctsTest {
         // Pure random playouts rate a lone stone in atari as dead already, so the capture need not be the top move;
         // the challenge prior seeds it at the root with virtual wins.
         val r = Mcts(3).search(pos, 7.5, AiLevel.CHALLENGE, maxMillisOverride = 60_000)
-        assertTrue(r.ranked.any { it.point == p("E6") && it.visits >= Mcts.PRIOR_VISITS })
+        // (Priors are off for every level now; the capture still has to be a searched candidate.)
+        assertTrue(r.ranked.any { it.point == p("E6") && it.visits > 0 })
     }
 
     @Test fun cancelled_search_stops() {

@@ -15,8 +15,12 @@ enum class AiLevel(val maxSims: Int, val maxMillis: Long, val topRandom: Int, va
      * emulator and 36 k on the JVM, so the caps were raised to keep the levels apart — see build handoff.)
      */
     INTERMEDIATE(3000, 2000, 1, false),
-    /** 挑战: ≤ 12000 simulations or 3.0 s (design 4000, raised after the spike), the best, with capture / atari-escape priors. */
-    CHALLENGE(12000, 3000, 1, true),
+    /**
+     * 挑战: ≤ 12000 simulations or 3.0 s (design 4000, raised after the spike), the best. The design's capture /
+     * atari-escape root prior is off: with it, 100 fixed-seed games against the beginner went 58 % (below the
+     * intermediate level's 86 %), because pure random playouts already rate most atari moves low.
+     */
+    CHALLENGE(12000, 3000, 1, false),
 }
 
 data class Candidate(val point: Int, val visits: Int, val winrate: Double)
