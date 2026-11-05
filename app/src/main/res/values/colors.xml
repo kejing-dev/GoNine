@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Go Nine icon background: slate teal, not used by any other factory app -->
+    <color name="icon_background">#FF4F6E78</color>
+</resources>

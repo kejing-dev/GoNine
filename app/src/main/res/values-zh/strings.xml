@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">九路围棋</string>
+
+    <string name="tab_play">对局</string>
+    <string name="tab_new">新局</string>
+    <string name="tab_rules">规则</string>
+    <string name="tab_settings">设置</string>
+
+    <string name="loading">在摆棋盘…</string>
+
+    <string name="black">黑</string>
+    <string name="white">白</string>
+    <string name="turn_you">轮到你（%1$s）</string>
+    <string name="turn_color">轮到%1$s</string>
+    <string name="turn_ai">对方在想…</string>
+    <string name="turn_handoff">轮到%1$s，递给 TA</string>
+    <string name="turn_scoring">数目中</string>
+    <string name="turn_over">这盘下完了</string>
+    <string name="captures_vs_ai">你提了 %1$d · 它提了 %2$d</string>
+    <string name="captures_local">黑提了 %1$d · 白提了 %2$d</string>
+    <string name="card_you_took">你提了 %1$d</string>
+    <string name="card_it_took">它提了 %1$d</string>
+    <string name="card_color_took">%1$s提了 %2$d</string>
+    <string name="card_ai_passed">它不下了</string>
+
+    <string name="hint_tap_again">再点一下就落。</string>
+    <string name="hint_suicide">这里没气，不能下。</string>
+    <string name="hint_ko">劫：先去别处下一手再回来提。</string>
+    <string name="hint_superko">这手会让棋盘回到之前的样子，不能下。</string>
+    <string name="hint_occupied">这里已经有子了。</string>
+    <string name="hint_atari">亮着的这块只剩一口气了。</string>
+    <string name="hint_ai_passed">它不下了。你也虚手，就开始数。</string>
+    <string name="hint_you_passed">你虚手了。</string>
+    <string name="hint_both_passed">都虚手了，来数。</string>
+    <string name="hint_handoff">递给对面的人。</string>
+    <string name="hint_your_move">点一个交叉点，先放一颗半透明的子。</string>
+    <string name="hint_first_game">亮着的是好点，不亮的也能下。</string>
+    <string name="hint_thinking">在想…</string>
+
+    <string name="btn_undo">悔一步</string>
+    <string name="btn_redo">重做</string>
+    <string name="btn_pass">虚手</string>
+    <string name="btn_hint_on">提示：开</string>
+    <string name="btn_hint_off">提示：关</string>
+    <string name="btn_mute">静音</string>
+    <string name="btn_muted">已静音</string>
+    <string name="btn_resign">认输</string>
+    <string name="play_meta_ai">第 %1$d 手 · %2$s · %3$s · 贴目 %4$s</string>
+    <string name="play_meta_local">第 %1$d 手 · 双人 · %2$s · 贴目 %3$s</string>
+    <string name="meta_handicap">让你 %1$d 子</string>
+    <string name="meta_even">分先</string>
+    <string name="play_no_game">还没开局。去新局页开一盘。</string>
+    <string name="btn_to_new">开一盘</string>
+
+    <string name="confirm_pass">这手不下了？</string>
+    <string name="confirm_pass_body">你虚手，对方也虚手，就开始数。</string>
+    <string name="confirm_pass_yes">不下了</string>
+    <string name="confirm_resign">认了？</string>
+    <string name="confirm_resign_body">这盘算对方赢。</string>
+    <string name="confirm_resign_yes">认输</string>
+    <string name="confirm_new">重开？</string>
+    <string name="confirm_new_body">这盘会被换掉。</string>
+    <string name="confirm_new_yes">重开</string>
+    <string name="confirm_think">再想想</string>
+
+    <string name="scoring_title">都虚手了，来数</string>
+    <string name="scoring_dead">我觉得这 %1$d 块%2$s子死了（打了 ✕）。不对就点它。</string>
+    <string name="scoring_no_dead">我没看到死子。觉得哪块死了就点它。</string>
+    <string name="scoring_checking">在看哪块死了…</string>
+    <string name="scoring_black">黑 %1$d</string>
+    <string name="scoring_white">白 %1$d + 贴 %2$s = %3$s</string>
+    <string name="scoring_lead">%1$s领先 %2$s 目</string>
+    <string name="btn_accept">就这样算</string>
+    <string name="btn_play_on">不对，继续下</string>
+    <string name="rule_area">数目按区域法：子 + 只挨着自己的空点，白加贴目。</string>
+
+    <string name="result_counted">%1$s赢 %2$s 目</string>
+    <string name="result_resigned">%1$s中盘胜（对方认输）</string>
+    <string name="result_detail_counted">数目 · 第 %1$d 手 · 黑 %2$d · 白 %3$d + %4$s</string>
+    <string name="result_detail_resigned">认输 · 第 %1$d 手</string>
+    <string name="result_you_won">你赢了。</string>
+    <string name="result_you_lost">这盘它赢了。</string>
+    <string name="btn_again">再来一局</string>
+    <string name="btn_menu">主菜单</string>
+    <string name="result_stats">对%1$s：赢 %2$d · 输 %3$d</string>
+
+    <string name="new_continue">继续上一盘（第 %1$d 手）</string>
+    <string name="new_who">和谁下</string>
+    <string name="new_vs_ai">人机</string>
+    <string name="new_local">双人同机</string>
+    <string name="new_you_play">你执</string>
+    <string name="new_random">随机</string>
+    <string name="new_level">AI</string>
+    <string name="level_beginner">入门</string>
+    <string name="level_intermediate">进阶</string>
+    <string name="level_challenge">挑战</string>
+    <string name="new_level_note">给下第一盘的人。会下的人会觉得它太弱。</string>
+    <string name="new_handicap">让你几子</string>
+    <string name="new_handicap_note">让你 2 子，没下过的人能赢。让子时白先。</string>
+    <string name="new_handicap_local">让黑几子</string>
+    <string name="new_komi">贴目</string>
+    <string name="new_komi_handicap">让子局 0.5</string>
+    <string name="btn_start">开始</string>
+
+    <string name="rules_lib_title">气</string>
+    <string name="rules_lib_body">子旁边的空点就是它的气，亮点那四个。</string>
+    <string name="rules_cap_title">提子</string>
+    <string name="rules_cap_body">气都没了就被提走，飞进你的罐盖。</string>
+    <string name="rules_ko_title">劫</string>
+    <string name="rules_ko_body">提了它，它不能马上提回来。先去别处下一手。</string>
+    <string name="rules_pass_title">虚手 · 数</string>
+    <string name="rules_pass_body">没地方下就按虚手。两个人都虚手，就铺方块数。</string>
+    <string name="rules_mistakes">新手常错</string>
+    <string name="mistake_1">自己的气也会少。围别人的时候，回头看一眼自己那块。</string>
+    <string name="mistake_2">边上和角上的子气更少，容易被吃，也更容易吃别人。</string>
+    <string name="mistake_3">劫不能马上提回来。先去别的地方下一手，它不补，你再提。</string>
+    <string name="mistake_4">没地方下了就虚手，不用硬填。填进自己眼里会把自己填死。</string>
+    <string name="rules_two_players">两个人同机下：第二个人用手柄点会比用眼睛准。</string>
+    <string name="btn_first_game">下第一盘（入门 · 让你 2 子）</string>
+
+    <string name="set_language">语言</string>
+    <string name="lang_system">跟随系统</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_en">English</string>
+    <string name="set_sound">音效</string>
+    <string name="set_volume">音量</string>
+    <string name="vol_low">低</string>
+    <string name="vol_mid">中</string>
+    <string name="vol_high">高</string>
+    <string name="set_reduced">减少动态</string>
+    <string name="set_tilt">棋盘倾角</string>
+    <string name="set_recall_q">面板跑远了？</string>
+    <string name="btn_recall">叫回面前</string>
+    <string name="recall_wait">看正前方，别动…</string>
+    <string name="set_about">关于</string>
+    <string name="about_text">九路围棋 %1$s · 全离线 · 图标 Material Symbols (Apache-2.0) · Noto Sans (OFL)</string>
+    <string name="btn_exit">退出应用</string>
+    <string name="exit_q">真的退出？</string>
+    <string name="exit_body">这盘已经存好了。</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_exit_yes">退出</string>
+    <string name="on">开</string>
+    <string name="off">关</string>
+
+    <string name="panel_closed">捏一下棋盘叫回面板</string>
+    <string name="level_gate">平视前方，面板就出来</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Go Nine launcher foreground: a corner of a 9x9 board (4 x 4 cells, one star point) and a black cloud stone
+     with a cream highlight, lower right. 108 dp canvas, content inside the 66 dp safe zone. No text. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- board corner -->
+    <path android:fillColor="#E9DCC3" android:pathData="M28,28h48a4,4 0,0 1,4 4v48a4,4 0,0 1,-4 4h-48a4,4 0,0 1,-4 -4v-48a4,4 0,0 1,4 -4z" />
+    <!-- grid lines: 4 x 4 cells -->
+    <path android:strokeColor="#6B5638" android:strokeWidth="1.6" android:pathData="M34,34H74M34,44H74M34,54H74M34,64H74M34,74H74M34,34V74M44,34V74M54,34V74M64,34V74M74,34V74" />
+    <!-- star point -->
+    <path android:fillColor="#6B5638" android:pathData="M44,44m-2.4,0a2.4,2.4 0,1 1,4.8 0a2.4,2.4 0,1 1,-4.8 0" />
+    <!-- black cloud stone at the lower right intersection, with a soft rim -->
+    <path android:fillColor="#1E2A26" android:pathData="M64,64m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0" />
+    <path android:fillColor="#F2EEE4" android:fillAlpha="0.85" android:pathData="M59.5,59.2m-3.2,0a3.2,2.2 0,1 1,6.4 0a3.2,2.2 0,1 1,-6.4 0" />
+</vector>

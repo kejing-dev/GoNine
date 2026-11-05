@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Go Nine</string>
+
+    <!-- pages (TabBar) -->
+    <string name="tab_play">Play</string>
+    <string name="tab_new">New</string>
+    <string name="tab_rules">Rules</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- S00 -->
+    <string name="loading">Setting out the board…</string>
+
+    <!-- seats -->
+    <string name="black">Black</string>
+    <string name="white">White</string>
+    <string name="turn_you">Your move (%1$s)</string>
+    <string name="turn_color">%1$s to play</string>
+    <string name="turn_ai">Opponent is thinking…</string>
+    <string name="turn_handoff">%1$s to play, pass it over</string>
+    <string name="turn_scoring">Counting</string>
+    <string name="turn_over">Game over</string>
+    <string name="captures_vs_ai">You took %1$d · It took %2$d</string>
+    <string name="captures_local">Black took %1$d · White took %2$d</string>
+    <string name="card_you_took">You took %1$d</string>
+    <string name="card_it_took">It took %1$d</string>
+    <string name="card_color_took">%1$s took %2$d</string>
+    <string name="card_ai_passed">It passed</string>
+
+    <!-- status line -->
+    <string name="hint_tap_again">Tap it again to play.</string>
+    <string name="hint_suicide">No liberties there. Can\'t play it.</string>
+    <string name="hint_ko">That\'s a ko. Can\'t retake it right now. Play somewhere else first.</string>
+    <string name="hint_superko">That would bring the board back to an earlier position. Not allowed.</string>
+    <string name="hint_occupied">There\'s already a stone there.</string>
+    <string name="hint_atari">One liberty left on the lit group.</string>
+    <string name="hint_ai_passed">It passed. Pass too and we count.</string>
+    <string name="hint_you_passed">You passed.</string>
+    <string name="hint_both_passed">Two passes, let\'s count.</string>
+    <string name="hint_handoff">Hand it to the other player.</string>
+    <string name="hint_your_move">Tap a point. A see-through stone shows where.</string>
+    <string name="hint_first_game">The lit points are good moves. Others are fine too.</string>
+    <string name="hint_thinking">Thinking…</string>
+
+    <!-- play page buttons -->
+    <string name="btn_undo">Undo</string>
+    <string name="btn_redo">Redo</string>
+    <string name="btn_pass">Pass</string>
+    <string name="btn_hint_on">Hint: on</string>
+    <string name="btn_hint_off">Hint: off</string>
+    <string name="btn_mute">Mute</string>
+    <string name="btn_muted">Muted</string>
+    <string name="btn_resign">Resign</string>
+    <string name="play_meta_ai">Move %1$d · %2$s · %3$s · Komi %4$s</string>
+    <string name="play_meta_local">Move %1$d · Two players · %2$s · Komi %3$s</string>
+    <string name="meta_handicap">%1$d-stone handicap</string>
+    <string name="meta_even">Even game</string>
+    <string name="play_no_game">No game yet. Start one on the New page.</string>
+    <string name="btn_to_new">New game</string>
+
+    <!-- S13 confirm -->
+    <string name="confirm_pass">Pass — are you sure?</string>
+    <string name="confirm_pass_body">If you pass and so does the other side, we count.</string>
+    <string name="confirm_pass_yes">Pass</string>
+    <string name="confirm_resign">Resign?</string>
+    <string name="confirm_resign_body">The other side wins this game.</string>
+    <string name="confirm_resign_yes">Resign</string>
+    <string name="confirm_new">Start over?</string>
+    <string name="confirm_new_body">This game will be replaced.</string>
+    <string name="confirm_new_yes">Start over</string>
+    <string name="confirm_think">Keep playing</string>
+
+    <!-- S07 scoring -->
+    <string name="scoring_title">Two passes, let\'s count</string>
+    <string name="scoring_dead">I think %1$d %2$s group(s) are dead (marked ✕). Tap one if I\'m wrong.</string>
+    <string name="scoring_no_dead">I don\'t see any dead groups. Tap a group to mark it dead.</string>
+    <string name="scoring_checking">Checking which groups are dead…</string>
+    <string name="scoring_black">Black %1$d</string>
+    <string name="scoring_white">White %1$d + komi %2$s = %3$s</string>
+    <string name="scoring_lead">%1$s ahead by %2$s</string>
+    <string name="btn_accept">Count it</string>
+    <string name="btn_play_on">Not right, play on</string>
+    <string name="rule_area">Area scoring: stones plus points touching only your stones. White adds komi.</string>
+
+    <!-- S09 result -->
+    <string name="result_counted">%1$s wins by %2$s</string>
+    <string name="result_resigned">%1$s wins by resignation</string>
+    <string name="result_detail_counted">Counted · Move %1$d · Black %2$d · White %3$d + %4$s</string>
+    <string name="result_detail_resigned">Resigned · Move %1$d</string>
+    <string name="result_you_won">You won.</string>
+    <string name="result_you_lost">It won this one.</string>
+    <string name="btn_again">Again?</string>
+    <string name="btn_menu">Menu</string>
+    <string name="result_stats">vs %1$s: won %2$d · lost %3$d</string>
+
+    <!-- S02 new game -->
+    <string name="new_continue">Continue this game (move %1$d)</string>
+    <string name="new_who">Play against</string>
+    <string name="new_vs_ai">Computer</string>
+    <string name="new_local">Two players</string>
+    <string name="new_you_play">You play</string>
+    <string name="new_random">Random</string>
+    <string name="new_level">Computer</string>
+    <string name="level_beginner">Beginner</string>
+    <string name="level_intermediate">Intermediate</string>
+    <string name="level_challenge">Challenge</string>
+    <string name="new_level_note">For your first games. Players who know Go will find it weak.</string>
+    <string name="new_handicap">Stones for you</string>
+    <string name="new_handicap_note">Two stones and a beginner can win. White moves first.</string>
+    <string name="new_handicap_local">Stones for Black</string>
+    <string name="new_komi">Komi</string>
+    <string name="new_komi_handicap">Handicap game: 0.5</string>
+    <string name="btn_start">Start</string>
+
+    <!-- S01 / S12 rules -->
+    <string name="rules_lib_title">Liberties</string>
+    <string name="rules_lib_body">The empty points next to a stone are its liberties. The four lit ones.</string>
+    <string name="rules_cap_title">Capture</string>
+    <string name="rules_cap_body">No liberties left and it\'s taken off. It goes in your lid.</string>
+    <string name="rules_ko_title">Ko</string>
+    <string name="rules_ko_body">You took it. It can\'t be taken right back. Play somewhere else first.</string>
+    <string name="rules_pass_title">Pass · count</string>
+    <string name="rules_pass_body">Nothing to play? Pass. Both pass, and the board is counted.</string>
+    <string name="rules_mistakes">Easy mistakes</string>
+    <string name="mistake_1">Your own liberties shrink too. While fencing them in, glance back at your group.</string>
+    <string name="mistake_2">Stones on the edge and in corners have fewer liberties. Easier to lose, easier to grab.</string>
+    <string name="mistake_3">You can\'t retake a ko right away. Play somewhere else first; if they don\'t fix it, take it back.</string>
+    <string name="mistake_4">Nothing good to play? Pass. Don\'t fill your own eyes, that kills your group.</string>
+    <string name="rules_two_players">Two players at one board: controllers aim more reliably than eyes for the second person.</string>
+    <string name="btn_first_game">Play your first game (Beginner · 2 stones)</string>
+
+    <!-- S11 settings -->
+    <string name="set_language">Language</string>
+    <string name="lang_system">System</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_en">English</string>
+    <string name="set_sound">Sound</string>
+    <string name="set_volume">Volume</string>
+    <string name="vol_low">Low</string>
+    <string name="vol_mid">Medium</string>
+    <string name="vol_high">High</string>
+    <string name="set_reduced">Reduce motion</string>
+    <string name="set_tilt">Board tilt</string>
+    <string name="set_recall_q">Panel wandered off?</string>
+    <string name="btn_recall">Bring it back</string>
+    <string name="recall_wait">Look straight ahead and hold still…</string>
+    <string name="set_about">About</string>
+    <string name="about_text">Go Nine %1$s · fully offline · icons Material Symbols (Apache-2.0) · Noto Sans (OFL)</string>
+    <string name="btn_exit">Quit app</string>
+    <string name="exit_q">Quit Go Nine?</string>
+    <string name="exit_body">Your game is saved.</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_exit_yes">Quit</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+
+    <!-- volume card when the panel is closed -->
+    <string name="panel_closed">Pinch the board for the panel</string>
+    <string name="level_gate">Look ahead to open the panel</string>
+</resources>
