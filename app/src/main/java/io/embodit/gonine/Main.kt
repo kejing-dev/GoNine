@@ -9,7 +9,6 @@ import com.pico.spatial.ui.foundation.dsl.SpatialAppScope
 import com.pico.spatial.ui.foundation.dsl.WindowContainer
 import com.pico.spatial.ui.foundation.dsl.WindowContainerSize
 import io.embodit.gonine.platform.Containers
-import io.embodit.gonine.platform.WindowCtl
 import io.embodit.gonine.ui.AppRoot
 import io.embodit.gonine.ui.board.BoardScreen
 import io.embodit.gonine.ui.control.ControlScreen
@@ -27,11 +26,9 @@ fun mainApp(scope: SpatialAppScope) =
             Containers.CONTROL,
             form = Form.Planar,
             defaultSize = WindowContainerSize(width = 560.dp, height = 600.dp),
-            placement = {
-                // Recall (and reopening from the volume) puts the window straight ahead (profile D44); launch puts it beside the board.
-                if (WindowCtl.placeInFront) Placement.none()
-                else containers.firstOrNull { it.id == Containers.BOARD }?.let { Placement.right(it) } ?: Placement.none()
-            },
+            // Launch, S10 reopen and [重开控制窗] all open beside the board (profile D44 corrected 2026-11-05: a Shared
+            // Space app reopens its panel, it does not promise "in front of you").
+            placement = { containers.firstOrNull { it.id == Containers.BOARD }?.let { Placement.right(it) } ?: Placement.none() },
         ) {
             AppRoot {
                 ControlScreen(Modifier.windowConstraints(minWidth = 520.dp, minHeight = 320.dp, maxWidth = 900.dp, maxHeight = 640.dp))

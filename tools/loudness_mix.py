@@ -47,16 +47,26 @@ def main():
             if i0 + i < n:
                 mix[i0 + i] += v * GAIN
                 seg[i0 + i] = True
+    # Overlapping events add up: keep the mix itself at or below -1 dBFS (QA #1 K1 found 2 clipped samples).
     peak = max(abs(v) for v in mix)
+    limit = 10 ** (-1.0 / 20)
+    if peak > limit:
+        mix = [v * limit / peak for v in mix]
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with wave.open(out, "wb") as w:
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR)
         w.writeframes(b"".join(struct.pack("<h", int(max(-1, min(1, v)) * 32767)) for v in mix))
+    # Measure what was written (16-bit), not the float mix.
+    with wave.open(out) as w:
+        d = w.readframes(w.getnframes())
+    mix = [s / 32768 for s in struct.unpack("<%dh" % (len(d) // 2), d)]
+    peak = max(abs(v) for v in mix)
+    clipped = sum(1 for v in mix if abs(v) >= 32767 / 32768)
     db = lambda v: 20 * math.log10(max(v, 1e-9))
     rms_all = math.sqrt(sum(v * v for v in mix) / n)
     ev = [v for v, s in zip(mix, seg) if s]
     rms_ev = math.sqrt(sum(v * v for v in ev) / len(ev))
-    print(f"{out}: 30.0 s, {len(EVENTS)} events, peak {db(peak):.1f} dBFS, RMS whole file {db(rms_all):.1f} dBFS, RMS of event segments {db(rms_ev):.1f} dBFS")
+    print(f"{out}: 30.0 s, {len(EVENTS)} events, clipped samples {clipped}, peak {db(peak):.2f} dBFS, RMS whole file {db(rms_all):.1f} dBFS, RMS of event segments {db(rms_ev):.1f} dBFS")
 
 
 if __name__ == "__main__":

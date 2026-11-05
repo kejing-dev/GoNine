@@ -117,7 +117,7 @@
     <string name="mistake_2">边上和角上的子气更少，容易被吃，也更容易吃别人。</string>
     <string name="mistake_3">劫不能马上提回来。先去别的地方下一手，它不补，你再提。</string>
     <string name="mistake_4">没地方下了就虚手，不用硬填。填进自己眼里会把自己填死。</string>
-    <string name="rules_recall">面板跑远了？点一下棋盘前面那块席位牌，面板就回到你面前。</string>
+    <string name="rules_recall">面板关了、或者跑远了？点设置里的 [重开控制窗]，或者点一下棋盘前面的席位牌。它会在棋盘右边重新打开，要挪就用系统把手拖。</string>
     <string name="rules_two_players">两个人同机下：第二个人用手柄点会比用眼睛准。</string>
     <string name="btn_first_game">下第一盘（入门 · 让你 2 子）</string>
 
@@ -132,9 +132,9 @@
     <string name="vol_high">高 100%</string>
     <string name="set_reduced">减少动态</string>
     <string name="set_tilt">棋盘倾角</string>
-    <string name="set_recall_q">面板跑远了？</string>
-    <string name="btn_recall">叫回面前</string>
-    <string name="recall_wait">正在叫回…</string>
+    <string name="set_recall_q">控制窗</string>
+    <string name="btn_recall">重开控制窗</string>
+    <string name="recall_wait">正在重开…</string>
     <string name="set_about">关于</string>
     <string name="about_text">九路围棋 %1$s · 全离线 · 图标 Material Symbols (Apache-2.0) · Noto Sans (OFL)</string>
     <string name="btn_exit">退出应用</string>
@@ -145,6 +145,6 @@
     <string name="on">开</string>
     <string name="off">关</string>
 
-    <string name="panel_closed">捏一下棋盘叫回面板</string>
+    <string name="panel_closed">捏一下棋盘重开面板</string>
     <string name="level_gate">平视前方，面板就出来</string>
 </resources>

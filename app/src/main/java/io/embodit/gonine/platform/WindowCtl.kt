@@ -32,13 +32,6 @@ object WindowCtl {
     // D29: the head has to hold level for 0.5 s before the window opens.
     private val gate = LevelGate(maxPitchDeg = 10f, dwellMs = 500L, noHeadMs = 1500L, maxWaitMs = 4000L)
 
-    /**
-     * Where the next open puts the window: beside the board at launch, in front of the user after [recall]
-     * (profile D44: recall uses `Placement.none()`, the system's default spot straight ahead). Read by Main.kt.
-     */
-    @Volatile
-    var placeInFront = false
-        private set
 
     /** Lifecycle of the control window as it reported it ("never", "ON_CREATE" … "ON_DESTROY"). */
     var panelState by mutableStateOf("never")
@@ -69,7 +62,6 @@ object WindowCtl {
 
     /** Asks for the window; it opens once the head is level (or the head pose is unavailable). */
     fun openWindow(why: String) {
-        placeInFront = why.startsWith("recall")
         // A Shared Space volume gets no head pose (NOT_IN_FULL_SPACE): nothing to wait for, open now (critic R3 / R10).
         HeadPitch.read()
         if (HeadPitch.unsupported) {
@@ -85,13 +77,25 @@ object WindowCtl {
         main.postDelayed(watchdog, 3000)
     }
 
-    /** [叫回面前]: close, wait for ON_DESTROY (an open straight after a close is swallowed), then ask again. */
+    /** [重开控制窗]: close, wait for ON_DESTROY (an open straight after a close is swallowed), then open beside the board. */
     fun recall() {
         if (isClosed) { openWindow("recall"); return }
         recallPending = true
         opening = true
         Log.i(TAG, "WINDOW recall close")
         runCatching { navigator?.closeWindowContainer(Containers.CONTROL, Containers.CONTROL_TAG) }
+    }
+
+    /**
+     * D44 exit: close BOTH containers (control window and the board volume) before the task ends; closing only the
+     * control window left a recents task that relaunched the board at its old world position (QA #1 q1-1).
+     */
+    fun closeAll() {
+        cancel()
+        val nav = navigator ?: return
+        runCatching { nav.closeWindowContainer(Containers.CONTROL, Containers.CONTROL_TAG) }.onFailure { Log.w(TAG, "EXIT close control: $it") }
+        runCatching { nav.closeWindowContainer() }.onFailure { Log.w(TAG, "EXIT close board: $it") }
+        Log.i(TAG, "EXIT closed control + board containers")
     }
 
     /** Debug: the system × (S10). */

@@ -127,7 +127,7 @@
     <string name="mistake_2">Stones on the edge and in corners have fewer liberties. Easier to lose, easier to grab.</string>
     <string name="mistake_3">You can\'t retake a ko right away. Play somewhere else first; if they don\'t fix it, take it back.</string>
     <string name="mistake_4">Nothing good to play? Pass. Don\'t fill your own eyes, that kills your group.</string>
-    <string name="rules_recall">Panel wandered off? Tap the card in front of the board and it comes back in front of you.</string>
+    <string name="rules_recall">Panel closed or wandered off? Tap [Reopen panel] in Settings, or tap the seat card in front of the board. It reopens beside the board. Drag it with the system handle.</string>
     <string name="rules_two_players">Two players at one board: controllers aim more reliably than eyes for the second person.</string>
     <string name="btn_first_game">Play your first game (Beginner · 2 stones)</string>
 
@@ -143,9 +143,9 @@
     <string name="vol_high">High 100%</string>
     <string name="set_reduced">Reduce motion</string>
     <string name="set_tilt">Board tilt</string>
-    <string name="set_recall_q">Panel wandered off?</string>
-    <string name="btn_recall">Bring it back</string>
-    <string name="recall_wait">Bringing it back…</string>
+    <string name="set_recall_q">Control panel</string>
+    <string name="btn_recall">Reopen panel</string>
+    <string name="recall_wait">Reopening…</string>
     <string name="set_about">About</string>
     <string name="about_text">Go Nine %1$s · fully offline · icons Material Symbols (Apache-2.0) · Noto Sans (OFL)</string>
     <string name="btn_exit">Quit app</string>
@@ -157,6 +157,6 @@
     <string name="off">Off</string>
 
     <!-- volume card when the panel is closed -->
-    <string name="panel_closed">Pinch the board for the panel</string>
+    <string name="panel_closed">Pinch the board to reopen the panel</string>
     <string name="level_gate">Look ahead to open the panel</string>
 </resources>

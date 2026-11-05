@@ -302,7 +302,7 @@ internal fun RulesPage(first: Boolean, graph: GoGraph) {
             Label("· " + stringResource(it), PicoTheme.typography.bodyMedium, "rules/mistake", maxLines = 3, modifier = Modifier.padding(top = 4.dp))
         }
         Gap(6.dp)
-        Label(stringResource(R.string.rules_recall), PicoTheme.typography.bodySmall, "rules/recall", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
+        Label(stringResource(R.string.rules_recall), PicoTheme.typography.bodySmall, "rules/recall", color = PicoTheme.colorScheme.labelSecondary, maxLines = 4)
         Label(stringResource(R.string.rules_two_players), PicoTheme.typography.bodySmall, "rules/twoPlayers", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
         Gap(16.dp)
     }

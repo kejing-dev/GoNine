@@ -48,7 +48,12 @@ import io.embodit.gonine.ui.board.scene.SceneStatus
 import kotlin.system.exitProcess
 
 /** The page the control window shows; process-wide so the flow and debug commands can switch it. */
-enum class Page { PLAY, NEW, RULES, SETTINGS }
+enum class Page(val label: Int, val icon: Int) {
+    PLAY(R.string.tab_play, R.drawable.ic_sports_esports),
+    NEW(R.string.tab_new, R.drawable.ic_add_circle),
+    RULES(R.string.tab_rules, R.drawable.ic_menu_book),
+    SETTINGS(R.string.tab_settings, R.drawable.ic_settings),
+}
 
 object ControlNav {
     var page by mutableStateOf(Page.PLAY)
@@ -100,21 +105,21 @@ fun ControlScreen(modifier: Modifier = Modifier) {
         }
 
         // The system TabBar: a small window of its own outside this one (native-window-move.md §3.6).
+        // The TabBar is a system window of its own: its content does not see this window's localised context, so the
+        // labels are resolved here and handed over as plain text (QA #1 q1-3: they stayed Chinese in English).
+        val labels = Page.entries.associateWith { stringResource(it.label) }
         TabBar(followViewpoints = setOf(ViewPoint.Front, ViewPoint.Left)) {
-            tab(Page.PLAY, R.drawable.ic_sports_esports, R.string.tab_play)
-            tab(Page.NEW, R.drawable.ic_add_circle, R.string.tab_new)
-            tab(Page.RULES, R.drawable.ic_menu_book, R.string.tab_rules)
-            tab(Page.SETTINGS, R.drawable.ic_settings, R.string.tab_settings)
+            for (page in Page.entries) tab(page, page.icon, labels.getValue(page))
         }
     }
 }
 
-private fun com.pico.spatial.ui.design.windows.TabBarScope.tab(page: Page, icon: Int, label: Int) {
+private fun com.pico.spatial.ui.design.windows.TabBarScope.tab(page: Page, icon: Int, label: String) {
     item(
         selected = ControlNav.page == page,
         onClick = { ControlNav.page = page; Log.i(GoGraph.TAG, "PAGE $page") },
-        mainContent = { Icon(painter = painterResource(icon), contentDescription = stringResource(label)) },
-        supportContent = { Label(stringResource(label), PicoTheme.typography.labelMedium, "tab/$page") },
+        mainContent = { Icon(painter = painterResource(icon), contentDescription = label) },
+        supportContent = { Label(label, PicoTheme.typography.labelMedium, "tab/$page") },
     )
 }
 
@@ -174,15 +179,15 @@ private fun SettingsPage(settings: io.embodit.gonine.domain.game.Settings, graph
     }
 }
 
-/** D26 exit: save, stop the head tracker, close the window, remove every task, end the process. */
+/** D26 / D44 exit: save, stop the head tracker, close both containers, remove every task, end the process. */
 internal fun exitApp(context: Context, graph: GoGraph) {
     Log.i(GoGraph.TAG, "EXIT save + release + finishAndRemoveTask + exitProcess")
     runCatching { graph.flow.onBackground() }
     runCatching { HeadPitch.stop() }
-    runCatching { WindowCtl.cancel(); WindowCtl.navigator?.closeWindowContainer(Containers.CONTROL, Containers.CONTROL_TAG) }
+    runCatching { WindowCtl.closeAll() }
     runCatching {
         val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         am.appTasks.forEach { runCatching { it.finishAndRemoveTask() } }
     }
-    Handler(Looper.getMainLooper()).postDelayed({ exitProcess(0) }, 400)
+    Handler(Looper.getMainLooper()).postDelayed({ exitProcess(0) }, 600)
 }
