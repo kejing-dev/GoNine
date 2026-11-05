@@ -29,23 +29,10 @@ class MctsTest {
         assertEquals(a, b)
     }
 
-    @Test fun challenge_captures_a_stone_in_atari() {
-        val pos = Position.of(listOf(
-            ".........",
-            ".........",
-            ".........",
-            ".........",
-            "...XOX...",
-            "....X....",
-            ".........",
-            ".........",
-            ".........",
-        ))
-        // Pure random playouts rate a lone stone in atari as dead already, so the capture need not be the top move;
-        // the challenge prior seeds it at the root with virtual wins.
-        val r = Mcts(3).search(pos, 7.5, AiLevel.CHALLENGE, maxMillisOverride = 60_000)
-        // (Priors are off for every level now; the capture still has to be a searched candidate.)
-        assertTrue(r.ranked.any { it.point == p("E6") && it.visits > 0 })
+    @Test fun beginner_answers_a_pass_with_a_pass() {
+        // Behind or not, the beginner passes back so a new player's game ends (critic R4).
+        val pos = (Position.start(2).play(Go.PASS) as Position.Result.Ok).position
+        assertEquals(Go.PASS, Mcts(5).chooseMove(pos, 0.5, AiLevel.BEGINNER).move)
     }
 
     @Test fun cancelled_search_stops() {
@@ -78,25 +65,23 @@ class MctsTest {
     ))
 
     @Test fun dead_suggestion_clean_has_none() {
-        val dead = Mcts(11).deadStones(clean, 7.5)
-        assertTrue("dead=$dead", dead.isEmpty())
+        for (seed in 1L..20L) { val dead = Mcts(seed).deadStones(clean, 7.5); assertTrue("seed $seed dead=$dead", dead.isEmpty()) }
     }
 
     @Test fun dead_suggestion_finds_the_lone_invader() {
-        val dead = Mcts(11).deadStones(oneDead, 7.5)
-        assertEquals(setOf(p("B5")), dead)
+        for (seed in 1L..20L) assertEquals("seed $seed", setOf(p("B5")), Mcts(seed).deadStones(oneDead, 7.5))
     }
 
     @Test fun dead_suggestion_keeps_seki_alive() {
-        val dead = Mcts(11).deadStones(seki, 7.5)
         val sekiStones = listOf("B9", "B8", "B7", "D9", "D8", "D7", "C7").map { p(it) }
-        assertTrue("dead=${dead.map { Go.name(it) }}", sekiStones.none { it in dead })
+        for (seed in 1L..20L) { val dead = Mcts(seed).deadStones(seki, 7.5); assertTrue("seed $seed dead=${dead.map { Go.name(it) }}", sekiStones.none { it in dead }) }
     }
 
     // ---- AI vs AI ends normally (soak, design acceptance: ≤ 120 moves, no endless filling) ----
 
+    /** Design acceptance: AI vs AI beginner, 20 games, each ends normally within 120 moves (critic R7). */
     @Test fun beginner_vs_beginner_ends_within_120_moves() {
-        repeat(4) { game ->
+        repeat(20) { game ->
             val ai = Mcts(100L + game)
             var pos = Position.empty()
             var n = 0

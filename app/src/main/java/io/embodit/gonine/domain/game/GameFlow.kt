@@ -38,13 +38,18 @@ interface Engine {
     fun reseed(seed: Long)
 }
 
+/**
+ * The real engine. Moves, hints and dead-stone suggestions each get their own [Mcts] (its playout boards are
+ * reused scratch space and must not be shared by two searches that overlap after a cancel; critic S2).
+ */
 class MctsEngine(seed: Long = System.nanoTime()) : Engine {
-    @Volatile private var mcts = Mcts(seed)
-    override fun choose(pos: Position, komi: Double, level: AiLevel, cancelled: () -> Boolean) = mcts.chooseMove(pos, komi, level, cancelled)
-    override fun suggest(pos: Position, komi: Double, millis: Long, cancelled: () -> Boolean) =
-        mcts.search(pos, komi, AiLevel.CHALLENGE, cancelled, maxSimsOverride = 3000, maxMillisOverride = millis)
-    override fun deadStones(pos: Position, komi: Double) = mcts.deadStones(pos, komi)
-    override fun reseed(seed: Long) { mcts = Mcts(seed) }
+    @Volatile private var mover = Mcts(seed)
+    @Volatile private var hinter = Mcts(seed + 1)
+    @Volatile private var counter = Mcts(seed + 2)
+    @Synchronized override fun choose(pos: Position, komi: Double, level: AiLevel, cancelled: () -> Boolean) = mover.chooseMove(pos, komi, level, cancelled)
+    override fun suggest(pos: Position, komi: Double, millis: Long, cancelled: () -> Boolean) = synchronized(hinter) { hinter.search(pos, komi, AiLevel.CHALLENGE, cancelled, maxSimsOverride = 3000, maxMillisOverride = millis) }
+    override fun deadStones(pos: Position, komi: Double) = synchronized(counter) { counter.deadStones(pos, komi) }
+    override fun reseed(seed: Long) { mover = Mcts(seed); hinter = Mcts(seed + 1); counter = Mcts(seed + 2) }
 }
 
 /** Sounds the flow asks for (the board plays the in-flight ones itself). */
@@ -242,20 +247,37 @@ class GameFlow(
         val s = current
         if (s.phase != Phase.IDLE) return
         if (s.position.passes >= 2) { enterScoring(); return }
-        if (s.isAiTurn) { if (autoAi) startAi() else _state.value = s.copy(phase = Phase.THINKING); return }
+        if (s.isAiTurn) {
+            // The human passed twice with only the AI's move between: the AI passes too and we count (critic R4).
+            val r = s.record
+            if (r.size >= 3 && r.last() == Go.PASS && r[r.size - 3] == Go.PASS && r[r.size - 2] != Record.RESUME) {
+                log("AI passes: human passed twice")
+                pass(byAi = true)
+                return
+            }
+            if (autoAi) startAi() else _state.value = s.copy(phase = Phase.THINKING)
+            return
+        }
         // The human's turn.
         val atari = s.atariLiberties
+        val r = s.record
+        val aiPlayedOnAfterPass = s.isVsAi && r.size >= 2 && r[r.size - 2] == Go.PASS && r.last() >= 0
         val hint = when {
             s.lastAiPassed -> Hint.AI_PASSED
+            aiPlayedOnAfterPass -> Hint.AI_PLAYS_ON
             s.config.mode == Mode.LOCAL && s.record.isNotEmpty() -> Hint.PASS_HANDOFF
             atari.isNotEmpty() -> Hint.ATARI
             else -> Hint.NONE
         }
-        if (atari.isNotEmpty() && s.hintsOn) sound(FlowSound.ALERT)
+        // The atari ding only when a new atari appears (critic S5).
+        if (atari.isNotEmpty() && s.hintsOn && atari.toSet() != lastAtari) sound(FlowSound.ALERT)
+        lastAtari = atari.toSet()
         _state.value = s.copy(hint = hint)
         if (autoPilot) { startAi(forHuman = true); return }
         if (s.hintsOn || s.firstGame) startHints()
     }
+
+    private var lastAtari: Set<Int> = emptySet()
 
     private fun startAi(forHuman: Boolean = false) {
         val s = current

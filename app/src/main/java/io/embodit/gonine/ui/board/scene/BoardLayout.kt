@@ -85,18 +85,20 @@ object BoardLayout {
 
     /** boardRoot space → scene space for [tiltDeg]. */
     fun boardToScene(local: P3, tiltDeg: Int): P3 {
-        // boardRoot sits in tiltRoot at (0, 0, -BOARD/2); tiltRoot at the near TOP edge (0, BOARD_THICK, PIVOT_Z)
-        // turned about +X. (Pivoting on the near bottom edge, as the design first drew it, pushes the near top
-        // edge 1.3 cm toward the player at 25° and into the cards; on the top edge it stays at z = +0.23.)
+        // boardRoot sits in tiltRoot at (0, 0, -BOARD/2); tiltRoot on the near TOP edge, turned about +X. Pivoting on
+        // the near bottom edge (the design's first drawing) pushes the near top edge 1.3 cm toward the player at 25°
+        // and into the cards; on the top edge it stays at z = +0.23. The pivot is lowered by 3 cm·(1 − cos a) so the
+        // near bottom edge still rests on the floor (critic R8: it floated 1.0 / 2.8 mm at 15 / 25°).
         val t = P3(local.x, local.y, local.z - BOARD / 2f)
         val a = tiltRad(tiltDeg)
         val y = t.y * cos(a) - t.z * sin(a)
         val z = t.y * sin(a) + t.z * cos(a)
-        return P3(t.x, y + BOARD_THICK, z + PIVOT_Z)
+        val pivot = tiltPivot(tiltDeg)
+        return P3(t.x + pivot.x, y + pivot.y, z + pivot.z)
     }
 
-    /** Where tiltRoot sits in scene space. */
-    val TILT_PIVOT = P3(0f, BOARD_THICK, PIVOT_Z)
+    /** Where tiltRoot sits in scene space for [tiltDeg]. */
+    fun tiltPivot(tiltDeg: Int) = P3(0f, BOARD_THICK * cos(tiltRad(tiltDeg)), PIVOT_Z)
 
     fun pointScene(p: Int, tiltDeg: Int, lift: Float = 0f) = boardToScene(pointLocal(p, lift), tiltDeg)
 

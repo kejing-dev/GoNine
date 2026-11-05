@@ -1,6 +1,6 @@
 # 九路围棋 Go Nine — project guidance
 
-9 x 9 Go for PICO OS 6 Shared Space, PICO Spatial SDK 6.1.9, package `io.embodit.gonine`, v0.1.0.
+9 x 9 Go for PICO OS 6 Shared Space, PICO Spatial SDK 6.1.9, package `io.embodit.gonine`, v0.1.1.
 Design contract: factory `apps/go-nine/design-package.json` (v1 = A12 main loop; `v2[]` — lessons, SGF, skin 2,
 review, coordinates, one-tap — is NOT built).
 
@@ -8,7 +8,7 @@ Two containers:
 - **Board volume** (default container `GoBoard`, Volumetric 0.80 x 0.36 x 0.52 m, fixed scale, gravity aligned):
   kaya board 0.46 m (5 cm pitch) tilted 0 / 15 / 25° about its near top edge, lens stones Ø 3.8 x 1.0 cm, two
   bowls, two lids turned over as capture trays, three cards in front (seat + two capture counts, no buttons).
-- **Control window** (`GoControl`, Planar 560 x 440 dp, `Placement.right(GoBoard)`): native TabBar pages
+- **Control window** (`GoControl`, Planar 560 x 600 dp so the settings page fits with Quit on screen; `Placement.right(GoBoard)` at launch and S10 reopen, `Placement.none()` (straight ahead) on recall, D44): native TabBar pages
   对局 / 新局 / 规则 / 设置. Drag / close / minimise are the system's controls; no custom handle anywhere (D21).
 
 ## Rules that stay in force
@@ -18,9 +18,9 @@ Two containers:
   `domain/engine` (UCT MCTS, random playouts that never fill own eyes). Turn flow only in `domain/game/GameFlow.kt`:
   a move is committed and saved before the board animates; the board reports `moveFinished`, a watchdog finishes
   it otherwise. Per-frame motion lives in `BoardScene.onFrame` (ECS `BoardFrameSystem`), never in Compose.
-- Every control-window open goes through `WindowCtl` + `LevelGate` (D9 / D29). In a Shared Space volume the HMD
-  provider reports `NOT_IN_FULL_SPACE`, so the gate opens after its 1.5 s no-head timeout. The head pitch is used
-  for nothing else.
+- Every control-window open goes through `WindowCtl` (D9 / D29). In a Shared Space volume the HMD provider reports
+  `NOT_IN_FULL_SPACE`, so it opens at once; with a head pose it waits for a level head at most 4 s (`LevelGate`).
+  The head pitch is used for nothing else. Recall has two entries: the settings button and a tap on the seat card.
 - With the window closed (system ×), the first pinch in the volume only reopens it (S10, `onBoardEvent`).
 - Visible pieces are procedural primitives on purpose (design B12 deviation); each call has `// gate:allow geometry`.
 
@@ -44,7 +44,9 @@ col 0 = A (left); `BoardLayout.pointLocal` / `pointScene`. The human's bowl is o
 export JAVA_HOME=~/.pico/primer-cli/jdk/jdk-21.0.13+9/Contents/Home
 ./gradlew :app:assembleDebug :app:testDebugUnitTest
 ./gradlew :app:testDebugUnitTest --tests '*StrengthTest*' -Pstrength=100   # AI strength, slow
-python3 tools/make_sounds.py --check                                       # regenerate sounds
+python3 tools/make_sounds.py --check                                       # regenerate sounds (peak -1, RMS ≥ -20)
+python3 tools/loudness_mix.py <factory>/apps/go-nine/qa/loudness-vX.wav  # B20 evidence
+SERIAL=emulator-5564 tools/harness/shoot_all.sh <outdir>                   # every QA state, after each build
 java -Djava.awt.headless=true tools/BuildIcon.java design/icon/icon-512.png 512
 adb -s emulator-5564 install -r app/build/outputs/apk/debug/app-debug.apk
 ```
@@ -59,6 +61,7 @@ Board taps go through the board's own input path (`BoardInput`), so S10 consumpt
 - states: `goto S01|S02|S03|S04|S06|S07|S09|S10|S11|S12|S13` · `page play|new|rules|settings`
 - settings: `lang system|zh|en` · `tilt 0|15|25` · `sound on|off` · `volume 0|1|2` · `reduced on|off`
 - window: `closepanel` (S10) · `reopen` · `recall`
+- capture aids: `flash hold|off` (red cross stays 3 s) · `icons` (all ic_* into files/icons.png; `adb exec-out run-as io.embodit.gonine cat files/icons.png`)
 - info: `dump` (board + phase + panel + head support) · `evidence` · `bench` (playouts / s + per-level search time)
 
 ## Screenshot checklist (QA)

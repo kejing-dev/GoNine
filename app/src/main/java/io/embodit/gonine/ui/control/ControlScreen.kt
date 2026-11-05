@@ -151,7 +151,7 @@ private fun SettingsPage(settings: io.embodit.gonine.domain.game.Settings, graph
             for (t in listOf(0, 15, 25)) ChoiceButton("$t°", settings.tilt == t, { graph.settings.update { it.copy(tilt = t) } }, "tilt/$t", Modifier.weight(1f))
         }
         ChoiceRow(stringResource(R.string.set_recall_q), "recall") {
-            // D29: the button hides while the window waits for a level head, then the window reopens in front.
+            // The button hides while the window closes and reopens straight ahead (Placement.none(), D44).
             if (WindowCtl.opening) Label(stringResource(R.string.recall_wait), PicoTheme.typography.bodyMedium, "recall/wait")
             else SecondaryButton(stringResource(R.string.btn_recall), { WindowCtl.recall() }, "recall", icon = R.drawable.ic_center_focus_strong)
         }

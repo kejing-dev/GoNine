@@ -145,7 +145,8 @@ class Mcts(seed: Long = System.nanoTime()) {
     fun chooseMove(pos: Position, komi: Double, level: AiLevel, cancelled: () -> Boolean = { false }): SearchResult {
         val r = search(pos, komi, level, cancelled)
         if (r.ranked.isEmpty()) return r.copy(move = Go.PASS, passReason = "no moves")
-        if (pos.passes >= 1 && r.winrate >= 0.5) return r.copy(move = Go.PASS, passReason = "opponent passed, winrate ${"%.2f".format(r.winrate)}")
+        // The beginner always answers a pass with a pass, so a new player's game can end (B27; critic R4).
+        if (pos.passes >= 1 && (r.winrate >= 0.5 || level == AiLevel.BEGINNER)) return r.copy(move = Go.PASS, passReason = "opponent passed, winrate ${"%.2f".format(r.winrate)} level=$level")
         val playable = r.ranked.map { it.point }
         val settled = playable.all { p -> r.blackOwnership[p] >= 0.9f || r.blackOwnership[p] <= 0.1f }
         if (settled && pos.moveNumber >= 20) return r.copy(move = Go.PASS, passReason = "all points settled")
@@ -157,10 +158,11 @@ class Mcts(seed: Long = System.nanoTime()) {
      * Dead-stone suggestion for scoring: [sims] playouts from [pos]; a block whose points end up owned by its own
      * colour in less than [threshold] of them is suggested dead. Returns the dead stones.
      */
-    fun deadStones(pos: Position, komi: Double, sims: Int = 400, threshold: Float = 0.35f): Set<Int> {
+    fun deadStones(pos: Position, komi: Double, sims: Int = 400, threshold: Float = 0.4f): Set<Int> {
+        // Half the playouts start with each colour to move, so the suggestion does not depend on whose turn it was.
         val blackOwn = IntArray(Go.SIZE)
-        repeat(sims) {
-            board.load(pos.cells, pos.toPlay, -1)
+        repeat(sims) { i ->
+            board.load(pos.cells, if (i % 2 == 0) Go.BLACK else Go.WHITE, -1)
             playout(board, komi)
             for (p in 0 until Go.SIZE) if (owner[p] == Go.BLACK) blackOwn[p]++
         }

@@ -33,6 +33,13 @@ class LevelGateTest {
         assertEquals("launch/nohead", g.step(6_600, null))
     }
 
+    @Test fun looking_down_too_long_opens_anyway_after_max_wait() {
+        val g = LevelGate(10f, 500L, 1500L, maxWaitMs = 4000L)
+        g.ask("launch", 0)
+        for (t in 0L..3900L step 100) assertNull(g.step(t, -25f))
+        assertEquals("launch/timeout", g.step(4000, -25f))
+    }
+
     @Test fun nothing_asked_nothing_opens() {
         assertNull(LevelGate().step(1000, 0f))
         assertFalse(LevelGate().hintWanted(-40f))

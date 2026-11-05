@@ -35,6 +35,7 @@
     <string name="hint_occupied">There\'s already a stone there.</string>
     <string name="hint_atari">One liberty left on the lit group.</string>
     <string name="hint_ai_passed">It passed. Pass too and we count.</string>
+    <string name="hint_ai_plays_on">It still wants to play. Pass once more and we count.</string>
     <string name="hint_you_passed">You passed.</string>
     <string name="hint_both_passed">Two passes, let\'s count.</string>
     <string name="hint_handoff">Hand it to the other player.</string>
@@ -102,7 +103,7 @@
     <string name="new_random">Random</string>
     <string name="new_level">Computer</string>
     <string name="level_beginner">Beginner</string>
-    <string name="level_intermediate">Intermediate</string>
+    <string name="level_intermediate">Improver</string>
     <string name="level_challenge">Challenge</string>
     <string name="new_level_note">For your first games. Players who know Go will find it weak.</string>
     <string name="new_handicap">Stones for you</string>
@@ -126,6 +127,7 @@
     <string name="mistake_2">Stones on the edge and in corners have fewer liberties. Easier to lose, easier to grab.</string>
     <string name="mistake_3">You can\'t retake a ko right away. Play somewhere else first; if they don\'t fix it, take it back.</string>
     <string name="mistake_4">Nothing good to play? Pass. Don\'t fill your own eyes, that kills your group.</string>
+    <string name="rules_recall">Panel wandered off? Tap the card in front of the board and it comes back in front of you.</string>
     <string name="rules_two_players">Two players at one board: controllers aim more reliably than eyes for the second person.</string>
     <string name="btn_first_game">Play your first game (Beginner · 2 stones)</string>
 
@@ -136,14 +138,14 @@
     <string name="lang_en">English</string>
     <string name="set_sound">Sound</string>
     <string name="set_volume">Volume</string>
-    <string name="vol_low">Low</string>
-    <string name="vol_mid">Medium</string>
-    <string name="vol_high">High</string>
+    <string name="vol_low">Low 45%</string>
+    <string name="vol_mid">Medium 70%</string>
+    <string name="vol_high">High 100%</string>
     <string name="set_reduced">Reduce motion</string>
     <string name="set_tilt">Board tilt</string>
     <string name="set_recall_q">Panel wandered off?</string>
     <string name="btn_recall">Bring it back</string>
-    <string name="recall_wait">Look straight ahead and hold still…</string>
+    <string name="recall_wait">Bringing it back…</string>
     <string name="set_about">About</string>
     <string name="about_text">Go Nine %1$s · fully offline · icons Material Symbols (Apache-2.0) · Noto Sans (OFL)</string>
     <string name="btn_exit">Quit app</string>

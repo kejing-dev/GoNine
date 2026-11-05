@@ -52,9 +52,9 @@ class BoardLayoutTest {
     @Test fun board_near_edge_never_moves_toward_the_cards() {
         for (tilt in BoardLayout.TILTS) {
             val nearTop = BoardLayout.boardToScene(P3(0f, 0f, BoardLayout.BOARD / 2), tilt)
-            assertEquals(BoardLayout.PIVOT_Z, nearTop.z, 1e-5f)
+            assertTrue(nearTop.z <= BoardLayout.PIVOT_Z + 1e-5f)
             val nearBottom = BoardLayout.boardToScene(P3(0f, -BoardLayout.BOARD_THICK, BoardLayout.BOARD / 2), tilt)
-            assertTrue(nearBottom.y >= -1e-5f)
+            assertEquals("near bottom edge rests on the floor at $tilt°", 0f, nearBottom.y, 1e-5f)
         }
     }
 

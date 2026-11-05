@@ -17,6 +17,7 @@ import io.embodit.gonine.domain.rules.Go
 import io.embodit.gonine.domain.rules.Position
 import io.embodit.gonine.ui.board.BoardInput
 import io.embodit.gonine.ui.board.SceneEvent
+import io.embodit.gonine.ui.board.scene.BoardScene
 import io.embodit.gonine.ui.board.scene.BoardSceneHolder
 import io.embodit.gonine.ui.control.ControlNav
 import io.embodit.gonine.ui.control.Page
@@ -88,6 +89,8 @@ class DebugCommandReceiver : BroadcastReceiver() {
             "reopen" -> WindowCtl.openWindow("debug")
             "recall" -> WindowCtl.recall()
             "bench" -> bench()
+            "flash" -> BoardScene.flashSeconds = if (a == "hold") 3f else 0.3f
+            "icons" -> renderIcons(context)
             "state", "dump" -> Log.i(TAG, "DUMP phase=${flow.current.phase} toPlay=${flow.current.toPlay} moves=${flow.current.moveCount} ghost=${flow.current.ghost?.let { Go.name(it) }} hint=${flow.current.hint} confirm=${flow.current.confirm} dead=${flow.current.dead.size} result=${flow.current.result} panel=${WindowCtl.panelState} page=${ControlNav.page} head=${HeadPitch.support}/${HeadPitch.last}\n${board(flow.current.cells)}")
             "evidence" -> Log.i(TAG, "EVIDENCE ${BoardSceneHolder.scene?.evidence() ?: "no scene"}")
             else -> Log.w(TAG, "unknown debug command: $cmd")
@@ -117,6 +120,29 @@ class DebugCommandReceiver : BroadcastReceiver() {
             "S13" -> { ensureGame(); ControlNav.page = Page.PLAY; flow.requestPass() }
             else -> Log.w(TAG, "goto $id: not reachable from adb (S00 = cold start, S05 = place, S08 = tap an illegal point, S16 = force-stop + start)")
         }
+    }
+
+    /** D23: every ic_* drawable rendered into one sheet (files/icons.png; adb pull via run-as). */
+    private fun renderIcons(context: Context) {
+        val fields = io.embodit.gonine.R.drawable::class.java.fields.filter { it.name.startsWith("ic_") && it.name != "ic_launcher_foreground" }.sortedBy { it.name }
+        val cell = 160
+        val cols = 5
+        val rows = (fields.size + cols - 1) / cols
+        val bmp = android.graphics.Bitmap.createBitmap(cols * cell, rows * cell, android.graphics.Bitmap.Config.ARGB_8888)
+        val c = android.graphics.Canvas(bmp)
+        c.drawColor(android.graphics.Color.WHITE)
+        val text = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.BLACK; textSize = 16f; textAlign = android.graphics.Paint.Align.CENTER }
+        fields.forEachIndexed { i, f ->
+            val d = context.getDrawable(f.getInt(null))!!.mutate()
+            d.setTint(android.graphics.Color.BLACK)
+            val x = (i % cols) * cell; val y = (i / cols) * cell
+            d.setBounds(x + 40, y + 20, x + 120, y + 100)
+            d.draw(c)
+            c.drawText(f.name.removePrefix("ic_"), x + cell / 2f, y + 135f, text)
+        }
+        val out = java.io.File(context.filesDir, "icons.png")
+        out.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
+        Log.i(TAG, "ICONS ${fields.size} -> ${out.absolutePath}")
     }
 
     private fun bench() {

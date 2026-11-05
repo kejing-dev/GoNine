@@ -37,7 +37,7 @@ class SoundPlayer(private val context: Context) {
 
     fun apply(s: Settings) {
         enabled = s.sound
-        gain = when (s.volume) { 0 -> 0.35f; 1 -> 0.65f; else -> 1f }
+        gain = when (s.volume) { 0 -> 0.45f; 1 -> 0.7f; else -> 1f }
     }
 
     fun play(kind: SoundKind) {

@@ -2,6 +2,7 @@ package io.embodit.gonine.ui.board
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -189,22 +190,25 @@ private fun BoardView(state: BoardUiState, game: GameState, onEvent: (SceneEvent
     )
 }
 
+private var loggedDp = false
+
 /** Size of a card in dp for its physical size, so the 1.8 cm text is really 1.8 cm (D13). */
 @Composable
 private fun metresToDp(m: Float): Float {
     val conv = LocalPhysicalLengthConverter.current
     val perDp = with(conv) { conv.dpToLength(1.dp, LengthUnit.Meters) }
+    if (!loggedDp) { loggedDp = true; Log.i(BoardScene.TAG, "CARD dp→m 1 dp = ${perDp * 1000f} mm (attachment panel)") }
     return if (perDp > 0f) m / perDp else m * 1000f
 }
 
 @Composable
-private fun Card(widthM: Float, text: String) {
+private fun Card(widthM: Float, text: String, onTap: (() -> Unit)? = null) {
     val w = metresToDp(widthM)
     val h = metresToDp(BoardLayout.CARD_H)
     // Glyph height ≈ 0.72 × font size: a 1.8 cm capital needs a font of 1.8 / 0.72 = 2.5 cm.
     val font = metresToDp(0.018f / 0.72f) * 0.62f
     Box(
-        modifier = Modifier.widthIn(min = w.dp).height(h.dp).clip(RoundedCornerShape((h * 0.3f).dp)).background(GoColors.CardBack).padding(horizontal = (h * 0.3f).dp),
+        modifier = Modifier.widthIn(min = w.dp).height(h.dp).clip(RoundedCornerShape((h * 0.3f).dp)).background(GoColors.CardBack).then(if (onTap != null) Modifier.clickable { onTap() } else Modifier).padding(horizontal = (h * 0.3f).dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -214,6 +218,7 @@ private fun Card(widthM: Float, text: String) {
     }
 }
 
+/** The seat card doubles as the in-volume way to bring the panel back in front (critic R3: not only inside the panel). */
 @Composable
 private fun SeatCard(game: GameState) {
     val colorName = stringResource(if (game.toPlay == Go.BLACK) R.string.black else R.string.white)
@@ -228,7 +233,10 @@ private fun SeatCard(game: GameState) {
         game.config.mode == Mode.LOCAL -> stringResource(R.string.turn_handoff, colorName)
         else -> stringResource(R.string.turn_you, colorName)
     }
-    Card(BoardLayout.SEAT_CARD_W, text)
+    Card(BoardLayout.SEAT_CARD_W, text, onTap = {
+        Log.i(BoardScene.TAG, "CARD seat tapped: recall panel")
+        WindowCtl.recall()
+    })
 }
 
 @Composable

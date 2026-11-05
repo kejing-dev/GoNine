@@ -137,6 +137,7 @@ private fun statusLine(game: GameState): String = when (game.hint) {
     Hint.ILLEGAL_OCCUPIED -> stringResource(R.string.hint_occupied)
     Hint.ATARI -> stringResource(R.string.hint_atari)
     Hint.AI_PASSED -> stringResource(R.string.hint_ai_passed)
+    Hint.AI_PLAYS_ON -> stringResource(R.string.hint_ai_plays_on)
     Hint.YOUR_PASS_SEEN -> stringResource(R.string.hint_you_passed)
     Hint.BOTH_PASSED -> stringResource(R.string.hint_both_passed)
     Hint.PASS_HANDOFF -> stringResource(R.string.hint_handoff)
@@ -241,27 +242,27 @@ internal fun NewPage(game: GameState, graph: GoGraph) {
             return@Column
         }
         Gap(6.dp)
-        ChoiceRow(stringResource(R.string.new_who), "who") {
-            ChoiceButton(stringResource(R.string.new_vs_ai), draft.mode == Mode.VS_AI, { draft = draft.copy(mode = Mode.VS_AI) }, "who/ai", Modifier.weight(1f))
-            ChoiceButton(stringResource(R.string.new_local), draft.mode == Mode.LOCAL, { draft = draft.copy(mode = Mode.LOCAL) }, "who/local", Modifier.weight(1f))
+        ChoiceRow(stringResource(R.string.new_who), "who", labelWidth = 124.dp) {
+            ChoiceButton(stringResource(R.string.new_vs_ai), draft.mode == Mode.VS_AI, { draft = draft.copy(mode = Mode.VS_AI, handicap = if (draft.level == AiLevel.BEGINNER && draft.color == ColorChoice.BLACK) 2 else 0, komi = 7.5) }, "who/ai", Modifier.weight(1f))
+            ChoiceButton(stringResource(R.string.new_local), draft.mode == Mode.LOCAL, { draft = draft.copy(mode = Mode.LOCAL, handicap = 0, komi = 7.5) }, "who/local", Modifier.weight(1f))
         }
         if (draft.mode == Mode.VS_AI) {
-            ChoiceRow(stringResource(R.string.new_you_play), "color") {
+            ChoiceRow(stringResource(R.string.new_you_play), "color", labelWidth = 124.dp) {
                 listOf(ColorChoice.BLACK to R.string.black, ColorChoice.WHITE to R.string.white, ColorChoice.RANDOM to R.string.new_random).forEach { (c, res) ->
                     // With a handicap you always play black.
                     ChoiceButton(stringResource(res), draft.color == c || (draft.handicap > 0 && c == ColorChoice.BLACK), { draft = draft.copy(color = c, handicap = if (c != ColorChoice.BLACK) 0 else draft.handicap) }, "color/$c", Modifier.weight(1f), enabled = draft.handicap == 0 || c == ColorChoice.BLACK)
                 }
             }
-            ChoiceRow(stringResource(R.string.new_level), "level") {
+            ChoiceRow(stringResource(R.string.new_level), "level", labelWidth = 124.dp) {
                 AiLevel.entries.forEach { l -> ChoiceButton(levelName(l), draft.level == l, { draft = draft.copy(level = l, handicap = if (l == AiLevel.BEGINNER && draft.color == ColorChoice.BLACK) 2 else draft.handicap) }, "level/$l", Modifier.weight(1f)) }
             }
             Label(stringResource(R.string.new_level_note), PicoTheme.typography.bodySmall, "new/levelNote", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
         }
-        ChoiceRow(stringResource(if (draft.mode == Mode.VS_AI) R.string.new_handicap else R.string.new_handicap_local), "handicap") {
+        ChoiceRow(stringResource(if (draft.mode == Mode.VS_AI) R.string.new_handicap else R.string.new_handicap_local), "handicap", labelWidth = 124.dp) {
             for (h in listOf(0, 2, 3, 4)) ChoiceButton("$h", draft.handicap == h, { draft = draft.copy(handicap = h, color = if (h > 0) ColorChoice.BLACK else draft.color) }, "handicap/$h", Modifier.weight(1f))
         }
         if (draft.mode == Mode.VS_AI) Label(stringResource(R.string.new_handicap_note), PicoTheme.typography.bodySmall, "new/handicapNote", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
-        ChoiceRow(stringResource(R.string.new_komi), "komi") {
+        ChoiceRow(stringResource(R.string.new_komi), "komi", labelWidth = 124.dp) {
             if (draft.handicap > 0) Label(stringResource(R.string.new_komi_handicap), PicoTheme.typography.labelLarge, "komi/handicap", color = PicoTheme.colorScheme.labelSecondary)
             else for (k in listOf(7.5, 5.5)) ChoiceButton(komiText(k), draft.komi == k, { draft = draft.copy(komi = k) }, "komi/$k", Modifier.weight(1f))
         }
@@ -301,6 +302,7 @@ internal fun RulesPage(first: Boolean, graph: GoGraph) {
             Label("· " + stringResource(it), PicoTheme.typography.bodyMedium, "rules/mistake", maxLines = 3, modifier = Modifier.padding(top = 4.dp))
         }
         Gap(6.dp)
+        Label(stringResource(R.string.rules_recall), PicoTheme.typography.bodySmall, "rules/recall", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
         Label(stringResource(R.string.rules_two_players), PicoTheme.typography.bodySmall, "rules/twoPlayers", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
         Gap(16.dp)
     }

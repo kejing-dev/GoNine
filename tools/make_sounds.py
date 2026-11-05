@@ -2,7 +2,7 @@
 
   python3 tools/make_sounds.py [--check]
 
-Writes app/src/main/assets/sounds/<kind>.wav (44.1 kHz mono 16-bit). Peaks are normalised to -6 dBFS; the
+Writes app/src/main/assets/sounds/<kind>.wav (44.1 kHz mono 16-bit). Peaks are normalised to -1 dBFS after a soft saturation (every event RMS ≥ -20 dBFS, B20); the
 three volume steps in the app scale from there. --check prints peak / RMS per file.
 """
 import math, os, random, struct, sys, wave
@@ -10,7 +10,8 @@ import math, os, random, struct, sys, wave
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "app", "src", "main", "assets", "sounds")
 SR = 44100
-PEAK_DB = -6.0
+PEAK_DB = -1.0  # B20: peak ≤ -1 dBFS; each event RMS ≥ -20 dBFS (design package used to say -11…-16, wrong way round)
+DRIVE = 3.0     # soft saturation before normalising: lifts the body of short clicks
 
 
 def env(t, attack, decay):
@@ -54,7 +55,12 @@ def seq(parts, gap):
 
 def norm(x):
     peak = max(1e-9, max(abs(v) for v in x))
-    k = 10 ** (PEAK_DB / 20) / peak
+    x = [math.tanh(DRIVE * v / peak) / math.tanh(DRIVE) for v in x]
+    # Trim the silent tail (below -50 dBFS) so the file RMS measures the sound, not the silence after it.
+    floor = 10 ** (-50 / 20)
+    end = max(i for i, v in enumerate(x) if abs(v) > floor) + 1
+    x = x[:end]
+    k = 10 ** (PEAK_DB / 20) / max(abs(v) for v in x)
     return [v * k for v in x]
 
 

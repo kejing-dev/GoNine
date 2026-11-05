@@ -30,7 +30,15 @@ object WindowCtl {
     private const val TAG = "GoNine"
     private val main = Handler(Looper.getMainLooper())
     // D29: the head has to hold level for 0.5 s before the window opens.
-    private val gate = LevelGate(maxPitchDeg = 10f, dwellMs = 500L, noHeadMs = 1500L)
+    private val gate = LevelGate(maxPitchDeg = 10f, dwellMs = 500L, noHeadMs = 1500L, maxWaitMs = 4000L)
+
+    /**
+     * Where the next open puts the window: beside the board at launch, in front of the user after [recall]
+     * (profile D44: recall uses `Placement.none()`, the system's default spot straight ahead). Read by Main.kt.
+     */
+    @Volatile
+    var placeInFront = false
+        private set
 
     /** Lifecycle of the control window as it reported it ("never", "ON_CREATE" … "ON_DESTROY"). */
     var panelState by mutableStateOf("never")
@@ -61,6 +69,15 @@ object WindowCtl {
 
     /** Asks for the window; it opens once the head is level (or the head pose is unavailable). */
     fun openWindow(why: String) {
+        placeInFront = why.startsWith("recall")
+        // A Shared Space volume gets no head pose (NOT_IN_FULL_SPACE): nothing to wait for, open now (critic R3 / R10).
+        HeadPitch.read()
+        if (HeadPitch.unsupported) {
+            gate.cancel()
+            levelHint = false
+            openNow("$why/${HeadPitch.support}")
+            return
+        }
         gate.ask(why, SystemClock.elapsedRealtime())
         opening = true
         Log.i(TAG, "WINDOW ask why=$why")
@@ -153,6 +170,9 @@ object HeadPitch {
         last = pitch
         return pitch
     }
+
+    /** The provider answered and said it cannot give a pose here (NOT_IN_FULL_SPACE, DEVICE_NOT_SUPPORTED, …). */
+    val unsupported: Boolean get() = support.startsWith("NOT") || support.startsWith("DEVICE_NOT") || support.startsWith("WITHOUT")
 
     fun stop() {
         runCatching { provider?.stop() }

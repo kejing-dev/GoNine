@@ -31,6 +31,7 @@
     <string name="hint_occupied">这里已经有子了。</string>
     <string name="hint_atari">亮着的这块只剩一口气了。</string>
     <string name="hint_ai_passed">它不下了。你也虚手，就开始数。</string>
+    <string name="hint_ai_plays_on">它还想下，再按一次虚手就直接数。</string>
     <string name="hint_you_passed">你虚手了。</string>
     <string name="hint_both_passed">都虚手了，来数。</string>
     <string name="hint_handoff">递给对面的人。</string>
@@ -116,6 +117,7 @@
     <string name="mistake_2">边上和角上的子气更少，容易被吃，也更容易吃别人。</string>
     <string name="mistake_3">劫不能马上提回来。先去别的地方下一手，它不补，你再提。</string>
     <string name="mistake_4">没地方下了就虚手，不用硬填。填进自己眼里会把自己填死。</string>
+    <string name="rules_recall">面板跑远了？点一下棋盘前面那块席位牌，面板就回到你面前。</string>
     <string name="rules_two_players">两个人同机下：第二个人用手柄点会比用眼睛准。</string>
     <string name="btn_first_game">下第一盘（入门 · 让你 2 子）</string>
 
@@ -125,14 +127,14 @@
     <string name="lang_en">English</string>
     <string name="set_sound">音效</string>
     <string name="set_volume">音量</string>
-    <string name="vol_low">低</string>
-    <string name="vol_mid">中</string>
-    <string name="vol_high">高</string>
+    <string name="vol_low">低 45%</string>
+    <string name="vol_mid">中 70%</string>
+    <string name="vol_high">高 100%</string>
     <string name="set_reduced">减少动态</string>
     <string name="set_tilt">棋盘倾角</string>
     <string name="set_recall_q">面板跑远了？</string>
     <string name="btn_recall">叫回面前</string>
-    <string name="recall_wait">看正前方，别动…</string>
+    <string name="recall_wait">正在叫回…</string>
     <string name="set_about">关于</string>
     <string name="about_text">九路围棋 %1$s · 全离线 · 图标 Material Symbols (Apache-2.0) · Noto Sans (OFL)</string>
     <string name="btn_exit">退出应用</string>

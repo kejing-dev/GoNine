@@ -238,7 +238,8 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
 
     private fun setTilt(deg: Int) {
         appliedTilt = deg
-        tiltRoot.transform().setPosition(Vector3(BoardLayout.TILT_PIVOT.x, BoardLayout.TILT_PIVOT.y, BoardLayout.TILT_PIVOT.z))
+        val pivot = BoardLayout.tiltPivot(deg)
+        tiltRoot.transform().setPosition(Vector3(pivot.x, pivot.y, pivot.z))
         tiltRoot.transform().setQuaternion(Quat(Vector3(1f, 0f, 0f), BoardLayout.tiltRad(deg)))
         Log.i(TAG, "TILT $deg")
     }
@@ -448,7 +449,7 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
         val f = s.flash
         if (f != null && f.id != flashId) {
             flashId = f.id
-            flashUntil = clock + 0.3f
+            flashUntil = clock + flashSeconds
             flashCross?.let { c ->
                 val at = BoardLayout.pointLocal(f.point, BoardLayout.STONE_T + 0.004f)
                 c.transform().setPosition(Vector3(at.x, at.y, at.z))
@@ -595,6 +596,10 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
 
     companion object {
         const val TAG = "GoNine"
+
+        /** How long the red cross stays (S08: 300 ms; debug `flash hold` keeps it 3 s so QA can photograph it, D36). */
+        @Volatile
+        var flashSeconds = 0.3f
         const val PAD = "pt:"
         const val STONE = "st:"
         const val GHOST = "ghost:"

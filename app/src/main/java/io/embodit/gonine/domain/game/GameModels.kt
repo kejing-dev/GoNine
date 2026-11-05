@@ -70,6 +70,8 @@ enum class Hint {
     ILLEGAL_OCCUPIED,
     ATARI,
     AI_PASSED,
+    /** The AI answered your pass with a move: one more pass and we count. */
+    AI_PLAYS_ON,
     YOUR_PASS_SEEN,
     BOTH_PASSED,
     PASS_HANDOFF,

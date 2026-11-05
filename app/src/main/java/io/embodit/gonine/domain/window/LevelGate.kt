@@ -6,9 +6,10 @@ import kotlin.math.abs
  * Opens a system window only while the head is level (native-window-move.md §7.9, profile D9 / D29): the
  * caller feeds the time and the head pitch every frame (degrees, + up; null = no valid head pose). A request
  * opens once |pitch| ≤ [maxPitchDeg] has held for [dwellMs]; with no head pose for [noHeadMs] (counted from
- * the first frame, not from the request) it opens anyway. Pure Kotlin, unit-tested.
+ * the first frame, not from the request) it opens anyway; and after [maxWaitMs] from the request it opens whatever the
+ * head does (a seated player looking down at a board on the desk must not wait forever; critic R10). Pure Kotlin.
  */
-class LevelGate(val maxPitchDeg: Float = 10f, val dwellMs: Long = 300L, val noHeadMs: Long = 5000L) {
+class LevelGate(val maxPitchDeg: Float = 10f, val dwellMs: Long = 300L, val noHeadMs: Long = 5000L, val maxWaitMs: Long = Long.MAX_VALUE) {
     var pending: String? = null
         private set
     private var askedMs = 0L
@@ -34,6 +35,7 @@ class LevelGate(val maxPitchDeg: Float = 10f, val dwellMs: Long = 300L, val noHe
     /** Returns why to open now, or null to keep waiting. */
     fun step(now: Long, pitchDeg: Float?): String? {
         val why = pending ?: return null
+        if (now - askedMs >= maxWaitMs) { cancel(); return "$why/timeout" }
         if (pitchDeg == null || !pitchDeg.isFinite()) {
             levelSinceMs = -1L
             if (noHeadSinceMs < 0L) noHeadSinceMs = now

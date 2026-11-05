@@ -157,6 +157,27 @@ class GameFlowTest {
         assertTrue(flow.current.dead.isEmpty())
     }
 
+    @Test fun human_passing_twice_ends_the_game_even_if_the_ai_plays_on() {
+        // An engine that never passes: the second human pass still leads to counting (critic R4).
+        val stubborn = object : Engine {
+            override fun choose(pos: Position, komi: Double, level: AiLevel, cancelled: () -> Boolean): SearchResult {
+                val m = pos.legalPoints().first(); return SearchResult(m, listOf(Candidate(m, 1, 0.3)), 0.3, FloatArray(Go.SIZE) { 0.5f }, 1, 1)
+            }
+            override fun suggest(pos: Position, komi: Double, millis: Long, cancelled: () -> Boolean) = choose(pos, komi, AiLevel.BEGINNER, cancelled)
+            override fun deadStones(pos: Position, komi: Double) = emptySet<Int>()
+            override fun reseed(seed: Long) = Unit
+        }
+        val d = StandardTestDispatcher(); val scope = TestScope(d)
+        val flow = GameFlow(scope, MemoryGameStore(), stubborn, d)
+        flow.newGame(GameConfig(level = AiLevel.CHALLENGE, handicap = 0))
+        flow.requestPass(); flow.confirm()
+        scope.advanceUntilIdle()
+        assertEquals(Hint.AI_PLAYS_ON, flow.current.hint)
+        flow.requestPass(); flow.confirm()
+        scope.advanceUntilIdle()
+        assertEquals(Phase.SCORING, flow.current.phase)
+    }
+
     @Test fun save_codec_round_trip() {
         val s = GameState(config = GameConfig(Mode.LOCAL, ColorChoice.WHITE, AiLevel.CHALLENGE, 3, 5.5), humanColor = Go.BLACK, record = listOf(1, -1, Record.RESUME, 40), redo = listOf(5), dead = setOf(3), phase = Phase.SCORING)
         val back = SaveCodec.decode(SaveCodec.encode(s))!!

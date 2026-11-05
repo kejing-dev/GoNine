@@ -51,6 +51,9 @@ class StrengthTest {
 
     @Test fun challenge_vs_beginner() { assumeTrue(games > 0); match("challenge", AiLevel.CHALLENGE, AiLevel.BEGINNER) }
 
+    /** Neighbouring levels must be ordered too (critic S1): challenge vs intermediate ≥ 60 %. */
+    @Test fun challenge_vs_intermediate() { assumeTrue(games > 0); match("challenge", AiLevel.CHALLENGE, AiLevel.INTERMEDIATE) }
+
     @Test fun intermediate_vs_beginner() { assumeTrue(games > 0); match("intermediate", AiLevel.INTERMEDIATE, AiLevel.BEGINNER) }
 
     @Test fun beginner_giving_two_stones_vs_script() {
