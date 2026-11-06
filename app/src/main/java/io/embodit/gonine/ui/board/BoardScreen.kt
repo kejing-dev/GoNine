@@ -194,6 +194,8 @@ private var loggedDp = false
 private var loggedFont = false
 private const val CARD_GLYPH_M = 0.018f
 private const val CJK_GLYPH_RATIO = 0.88f
+// Noto Sans capitals are 0.714 em; 0.68 leaves margin so the rendered capitals measure ≥ 18 mm on screen (q3-1).
+private const val LATIN_CAP_RATIO = 0.68f
 
 /** Size of a card in dp for its physical size, so the 1.8 cm text is really 1.8 cm (D13). */
 @Composable
@@ -208,9 +210,10 @@ private fun metresToDp(m: Float): Float {
 private fun Card(widthM: Float, text: String, onTap: (() -> Unit)? = null) {
     val w = metresToDp(widthM)
     val h = metresToDp(BoardLayout.CARD_H)
-    // mustPass M5: 1.8 cm glyphs. A CJK glyph is ≈ 0.88 × the font size, so the font is 1.8 / 0.88 = 2.05 cm.
-    val font = metresToDp(CARD_GLYPH_M / CJK_GLYPH_RATIO)
-    if (!loggedFont) { loggedFont = true; Log.i(BoardScene.TAG, "CARD font ${"%.1f".format(font)} sp, glyph ≈ ${"%.1f".format(CARD_GLYPH_M * 1000)} mm (CJK) / ${"%.1f".format(CARD_GLYPH_M / CJK_GLYPH_RATIO * 0.72f * 1000)} mm (Latin capitals)") }
+    // mustPass M5: 1.8 cm glyphs in both languages. Latin capitals are the smaller script (≈ 0.71 × the font size), so
+    // the font is 1.8 / 0.68 ≈ 2.65 cm (33 sp at 0.8 mm / dp); CJK glyphs (≈ 0.88 ×) come out at ≈ 2.3 cm (QA #3 q3-1).
+    val font = metresToDp(CARD_GLYPH_M / LATIN_CAP_RATIO)
+    if (!loggedFont) { loggedFont = true; Log.i(BoardScene.TAG, "CARD font ${"%.1f".format(font)} sp = ${"%.1f".format(font * 0.8f)} mm; Latin capitals (Noto 0.714 em) ≈ ${"%.1f".format(font * 0.8f * 0.714f)} mm, CJK (0.88 em) ≈ ${"%.1f".format(font * 0.8f * CJK_GLYPH_RATIO)} mm (needs ≥ 18)") }
     Box(
         modifier = Modifier.widthIn(min = w.dp).height(h.dp).clip(RoundedCornerShape((h * 0.3f).dp)).background(GoColors.CardBack).then(if (onTap != null) Modifier.clickable { onTap() } else Modifier).padding(horizontal = (h * 0.3f).dp),
         contentAlignment = Alignment.Center,

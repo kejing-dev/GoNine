@@ -70,6 +70,15 @@ object BoardLayout {
     const val SEAT_CARD_W = 0.14f
     const val COUNT_CARD_W = 0.10f
 
+    /**
+     * Widest the cards get with the 33 sp card font (cards grow with their text; ≈ 15.5 mm per Latin letter, 26 mm per
+     * CJK character): every seat text is ≤ 17 Latin letters / 10 CJK characters (≤ 0.29 m), the longest count
+     * "Black took 10" ≈ 0.23 m. The count cards sit 3 cm inward of the lids (x ±0.28) so the widest stays inside the volume.
+     */
+    const val SEAT_CARD_MAX_W = 0.30f
+    const val COUNT_CARD_MAX_W = 0.23f
+    const val COUNT_CARD_X = 0.28f
+
     // Markers.
     const val LIGHT_D = 0.012f
     const val CUBE = 0.014f
@@ -151,15 +160,15 @@ object BoardLayout {
     /** Card centres and their lean (scene space). */
     data class Card(val id: String, val center: P3, val width: Float)
 
-    fun cards(): List<Card> {
+    fun cards(seatW: Float = SEAT_CARD_W, countW: Float = COUNT_CARD_W): List<Card> {
         val tilt = Math.toRadians(CARD_TILT_DEG.toDouble())
         // Bottom edge at (y 0, z 0.252); leaning back 30°: the top edge is 4 cm up the slope.
         val cy = (CARD_H / 2 * cos(tilt)).toFloat()
         val cz = (CARD_BOTTOM_Z - CARD_H / 2 * sin(tilt)).toFloat()
         return listOf(
-            Card(CARD_SEAT, P3(0f, cy, cz), SEAT_CARD_W),
-            Card(CARD_RIGHT, P3(LID_X, cy, cz), COUNT_CARD_W),
-            Card(CARD_LEFT, P3(-LID_X, cy, cz), COUNT_CARD_W),
+            Card(CARD_SEAT, P3(0f, cy, cz), seatW),
+            Card(CARD_RIGHT, P3(COUNT_CARD_X, cy, cz), countW),
+            Card(CARD_LEFT, P3(-COUNT_CARD_X, cy, cz), countW),
         )
     }
 

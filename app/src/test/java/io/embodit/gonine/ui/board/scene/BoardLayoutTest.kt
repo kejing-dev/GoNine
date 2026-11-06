@@ -66,11 +66,11 @@ class BoardLayoutTest {
         }
     }
 
-    /** D35: card corners are outside every box and the eye→corner segments cross none (9 eyes x 3 tilts). */
+    /** D35: card corners are outside every box and the eye→corner segments cross none (9 eyes x 3 tilts), at default and widest card widths. */
     @Test fun cards_are_never_hidden_or_inside_the_pieces() {
-        for (tilt in BoardLayout.TILTS) {
+        for (tilt in BoardLayout.TILTS) for (cards in listOf(BoardLayout.cards(), BoardLayout.cards(BoardLayout.SEAT_CARD_MAX_W, BoardLayout.COUNT_CARD_MAX_W))) {
             val boxes = BoardLayout.solidBoxes(tilt)
-            for (card in BoardLayout.cards()) {
+            for (card in cards) {
                 val corners = BoardLayout.cardCorners(card)
                 for (corner in corners) for (b in boxes) assertFalse("${card.id} corner in ${b.name} tilt $tilt", b.contains(corner))
                 for ((eye, e) in BoardLayout.eyes()) for (corner in corners) for (b in boxes) {
@@ -80,11 +80,21 @@ class BoardLayoutTest {
         }
     }
 
+    /** The widest seat card and the widest count cards never touch each other (q3-1: bigger card font). */
+    @Test fun widest_cards_do_not_overlap() {
+        val c = BoardLayout.cards(BoardLayout.SEAT_CARD_MAX_W, BoardLayout.COUNT_CARD_MAX_W)
+        val seat = c.first { it.id == BoardLayout.CARD_SEAT }
+        for (count in c.filter { it.id != BoardLayout.CARD_SEAT }) {
+            assertTrue(kotlin.math.abs(count.center.x) - count.width / 2 > seat.width / 2 + 0.01f)
+            assertTrue(kotlin.math.abs(count.center.x) + count.width / 2 <= BoardLayout.VOLUME_W / 2)
+        }
+    }
+
     /** D20: the cards stay below the sight line to the first line of points (they never cover the board). */
     @Test fun cards_stay_below_the_sight_line_to_line_one() {
         for (tilt in BoardLayout.TILTS) for ((eye, e) in BoardLayout.eyes()) for (c in 0 until Go.N) {
             val target = BoardLayout.pointScene(Go.point(0, c), tilt, BoardLayout.STONE_T)
-            for (card in BoardLayout.cards()) {
+            for (card in BoardLayout.cards(BoardLayout.SEAT_CARD_MAX_W, BoardLayout.COUNT_CARD_MAX_W)) {
                 val top = BoardLayout.cardCorners(card).maxByOrNull { it.y }!!
                 if (abs(target.x - card.center.x) > card.width) continue
                 // Height of the eye→point line where it passes the card's top edge.

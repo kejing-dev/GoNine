@@ -16,8 +16,8 @@
     <string name="white">White</string>
     <string name="turn_you">Your move (%1$s)</string>
     <string name="turn_color">%1$s to play</string>
-    <string name="turn_ai">Opponent is thinking…</string>
-    <string name="turn_handoff">%1$s to play, pass it over</string>
+    <string name="turn_ai">It\'s thinking…</string>
+    <string name="turn_handoff">%1$s, hand over</string>
     <string name="turn_scoring">Counting</string>
     <string name="turn_over">Game over</string>
     <string name="captures_vs_ai">You took %1$d · It took %2$d</string>
@@ -157,6 +157,6 @@
     <string name="off">Off</string>
 
     <!-- volume card when the panel is closed -->
-    <string name="panel_closed">Pinch the board to reopen the panel</string>
-    <string name="level_gate">Look ahead to open the panel</string>
+    <string name="panel_closed">Pinch for panel</string>
+    <string name="level_gate">Look ahead</string>
 </resources>
