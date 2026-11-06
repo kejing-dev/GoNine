@@ -164,13 +164,23 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
     }
 
     private fun buildPoint(r: SceneResources, p: Int) {
-        // The pad is an invisible collider: 0.92 x pitch, 3 mm thin (design input).
-        pads[p] = collider("$PAD$p", r.padShape, BoardLayout.pointLocal(p, BoardLayout.POINT_PAD_T / 2f), boardRoot, r)
-        val holder = collider("$STONE$p", r.stoneShape, BoardLayout.pointLocal(p, BoardLayout.STONE_REST), boardRoot, r)
-        val m = model(r.stone, r.black, P3(0f, 0f, 0f), "stoneModel:$p", holder)
+        // v0.1.6 eye-hand hover (headset log: no HOVER / POINTER events reach the app in a Shared Space volume, only
+        // TAPs): the system draws its own hover highlight, and only on an entity that has a mesh. So the 0.92-pitch
+        // pad is now a mesh (a 0.6 mm tile, nearly transparent) carrying collider + Interactable + HoverEffect itself.
+        pads[p] = hoverable(model(r.padTile, r.padMat, BoardLayout.pointLocal(p, BoardLayout.POINT_PAD_T / 2f), "$PAD$p", boardRoot), r.padShape, r)
+        // The stone: collider + HoverEffect on the lens mesh itself (scaled; the shape is a cube so it scales to the lens).
+        val m = hoverable(model(r.stone, r.black, BoardLayout.pointLocal(p, BoardLayout.STONE_REST), "$STONE$p", boardRoot), r.stoneCube, r)
         lensScale(m)
-        holder.enabled = false
-        stones[p] = Holder(holder, m)
+        m.enabled = false
+        stones[p] = Holder(m, m)
+    }
+
+    /** Collider + Interactable + system HoverEffect on an entity that has its own mesh (the system highlights the mesh). */
+    private fun <E : Entity> hoverable(e: E, shape: ShapeResource, r: SceneResources): E {
+        e.components.set(CollisionComponent(collisionShape = listOf(shape), physicsMaterial = r.physics))
+        e.components.set(InteractableComponent())
+        e.components.set(HoverEffectComponent())
+        return e
     }
 
     private fun buildBowl(r: SceneResources, right: Boolean) {

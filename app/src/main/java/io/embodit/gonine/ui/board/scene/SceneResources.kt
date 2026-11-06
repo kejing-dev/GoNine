@@ -72,6 +72,8 @@ internal class SceneResources {
     val light: Material = unlit(GoColors.LibertyGlow)
     val cubeBlack: Material = unlit(GoColors.BlackStone, opacity = 0.7f)
     val cubeWhite: Material = unlit(GoColors.WhiteStone, opacity = 0.7f)
+    /** The point pads' own mesh (for the system hover highlight): kaya-tinted, almost invisible at rest. */
+    val padMat: Material = unlit(GoColors.Kaya, opacity = 0.04f)
     /** Hover hint (D50): a soft white ring on the point the pointer rests on. */
     val hover: Material = unlit(GoColors.HoverRing, opacity = 0.75f)
     /** A stone under the pointer glows a little (same colour, more light; never another colour, D44). */
@@ -112,6 +114,8 @@ internal class SceneResources {
     val hoverRing: MeshResource = MeshResource.createTorus(outerRingRadius = 0.021f, innerRingRadius = 0.0175f).keep()
     // gate:allow geometry liberty light: abstract glowing marker (design spatialOnly 气光点)
     val lightBall: MeshResource = MeshResource.createSphere(radius = BoardLayout.LIGHT_D / 2f).keep()
+    // gate:allow geometry point pad tile: invisible-at-rest hover target for the system highlight (eye-hand, D50)
+    val padTile: MeshResource = MeshResource.createBox(Vector3(BoardLayout.POINT_PAD, 0.0006f, BoardLayout.POINT_PAD), cornerRadius = 0.004f).keep()
     // gate:allow geometry scoring cube: abstract territory marker (design 数目方块)
     val cube: MeshResource = MeshResource.createBox(Vector3(BoardLayout.CUBE, BoardLayout.CUBE_T, BoardLayout.CUBE), cornerRadius = 0.0015f).keep()
 
@@ -119,6 +123,8 @@ internal class SceneResources {
     val physics: PhysicsMaterialResource = PhysicsMaterialResource().keep()
     val padShape: ShapeResource = ShapeResource.createBox(Vector3(BoardLayout.POINT_PAD, BoardLayout.POINT_PAD_T, BoardLayout.POINT_PAD)).keep()
     val stoneShape: ShapeResource = ShapeResource.createBox(Vector3(BoardLayout.STONE_D, BoardLayout.STONE_T, BoardLayout.STONE_D)).keep()
+    /** On the lens mesh itself, which is scaled by STONE_T / STONE_D in y: a cube becomes the lens's box. */
+    val stoneCube: ShapeResource = ShapeResource.createBox(Vector3(BoardLayout.STONE_D, BoardLayout.STONE_D, BoardLayout.STONE_D)).keep()
     val bowlShape: ShapeResource = ShapeResource.createBox(Vector3(BoardLayout.BOWL_R * 2, BoardLayout.BOWL_H, BoardLayout.BOWL_R * 2)).keep()
     val lidShape: ShapeResource = ShapeResource.createBox(Vector3(BoardLayout.LID_R * 2, 0.03f, BoardLayout.LID_R * 2)).keep()
 

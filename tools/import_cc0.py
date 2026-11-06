@@ -16,21 +16,23 @@ SR = 44100
 
 # kind: ([(pack, file, gap_after_s)], low-pass Hz, note)
 SOURCES = {
-    "place":   ([("kenney_impact-sounds", "impactWood_light_000.ogg", 0)], 4000, "落子：木头轻击（无邻子，最亮的一档）"),
-    "place_2": ([("kenney_impact-sounds", "impactWood_light_002.ogg", 0)], 3200, "落子：1–2 颗邻子，稍闷"),
-    "place_3": ([("kenney_impact-sounds", "impactWood_light_004.ogg", 0)], 2500, "落子：≥ 3 颗邻子，最闷"),
-    # Second take of each placement level: SoundPlayer alternates them (never the same take twice) + ±5 % pitch.
-    "place_b":   ([("kenney_impact-sounds", "impactWood_light_001.ogg", 0)], 4000, "落子第二个变体（无邻子）"),
-    "place_2_b": ([("kenney_impact-sounds", "impactWood_light_003.ogg", 0)], 3200, "落子第二个变体（1–2 颗邻子）"),
-    "place_3_b": ([("kenney_impact-sounds", "impactWood_medium_000.ogg", 0)], 2500, "落子第二个变体（≥ 3 颗邻子）"),
-    "capture": ([("kenney_impact-sounds", "impactPlate_light_001.ogg", 0)], 3600, "提子落进罐盖：瓷盘轻碰"),
-    "pick":    ([("kenney_casino-audio", "chips-handle-1.ogg", 0)], 3000, "罐里取子：筹码翻动的「沙」"),
-    "illegal": ([("kenney_impact-sounds", "impactWood_medium_003.ogg", 0)], 1200, "非法点：闷「咚」"),
-    "pass":    ([("kenney_impact-sounds", "impactWood_light_003.ogg", 0.09), ("kenney_impact-sounds", "impactWood_light_001.ogg", 0)], 3000, "虚手：轻敲盘边两下"),
-    "score":   ([("kenney_casino-audio", "chip-lay-1.ogg", 0.05), ("kenney_casino-audio", "chip-lay-2.ogg", 0.05), ("kenney_casino-audio", "chip-lay-3.ogg", 0)], 3600, "数目铺方块：细碎「嗒嗒」"),
-    "alert":   ([("kenney_interface-sounds", "confirmation_001.ogg", 0)], 4000, "UI：打吃提醒"),
-    "win":     ([("kenney_interface-sounds", "confirmation_002.ogg", 0)], 4000, "UI：你赢了"),
-    "lose":    ([("kenney_interface-sounds", "pluck_002.ogg", 0)], 4000, "UI：这盘它赢了"),
+    # v0.1.6 (user, headset: 「声音需要柔和一点，轻快一点，类似下棋之前确定的提示音」, profile D51 「好听优先于写实」):
+    # short, light, soft, slightly pitched — interface-sound blips in the 0.6–1.5 kHz range, no low thump, no hard knock.
+    # More neighbours = a slightly lower note (instead of the old "more muffled").
+    "place":     ([("kenney_interface-sounds", "glass_003.ogg", 0)], 4000, "落子（无邻子）：清亮的小「叮」，约 1.1 kHz，轻快"),
+    "place_b":   ([("kenney_interface-sounds", "select_003.ogg", 0)], 4000, "落子第二个变体（无邻子）：轻快的选择音，约 1.4 kHz"),
+    "place_2":   ([("kenney_interface-sounds", "glass_006.ogg", 0)], 4000, "落子（1–2 颗邻子）：柔和的「叮」，约 0.95 kHz"),
+    "place_2_b": ([("kenney_interface-sounds", "select_004.ogg", 0)], 4000, "落子第二个变体（1–2 颗邻子）：柔的选择音，约 0.9 kHz"),
+    "place_3":   ([("kenney_interface-sounds", "drop_004.ogg", 0)], 4000, "落子（≥ 3 颗邻子）：低一点的圆润「嘟」，约 0.63 kHz，不闷"),
+    "place_3_b": ([("kenney_interface-sounds", "select_005.ogg", 0)], 4000, "落子第二个变体（≥ 3 颗邻子）：柔和低一点，约 0.57 kHz"),
+    "capture":   ([("kenney_interface-sounds", "pluck_001.ogg", 0)], 4000, "提子落进罐盖：轻快的拨弦「叮」，约 1.7 kHz"),
+    "pick":      ([("kenney_interface-sounds", "tick_004.ogg", 0)], 3500, "罐里取子：很轻的「嗒」"),
+    "illegal":   ([("kenney_interface-sounds", "drop_003.ogg", 0)], 3000, "非法点：低一点的软「啵」（不是闷咚）"),
+    "pass":      ([("kenney_interface-sounds", "toggle_004.ogg", 0.08), ("kenney_interface-sounds", "toggle_001.ogg", 0)], 4000, "虚手：两下轻快的「嗒嗒」"),
+    "score":     ([("kenney_interface-sounds", "glass_005.ogg", 0.07), ("kenney_interface-sounds", "glass_002.ogg", 0.07), ("kenney_interface-sounds", "glass_006.ogg", 0)], 4000, "数目铺方块：三粒清亮的小「叮叮叮」"),
+    "alert":     ([("kenney_interface-sounds", "confirmation_001.ogg", 0)], 4000, "UI：打吃提醒（用户说好听的那一类确认音）"),
+    "win":       ([("kenney_interface-sounds", "confirmation_002.ogg", 0)], 4000, "UI：你赢了，上扬的确认音"),
+    "lose":      ([("kenney_interface-sounds", "minimize_008.ogg", 0)], 4000, "UI：这盘它赢了，温和下行"),
 }
 
 
@@ -68,6 +70,35 @@ def lowpass(x, fc):
     return x
 
 
+def highpass(x, fc=150.0):
+    # RBJ biquad high-pass (removes the low "thump", profile D51).
+    w0 = 2 * math.pi * fc / SR
+    a = math.sin(w0) / (2 * 0.7071)
+    c = math.cos(w0)
+    b0, b1, b2 = (1 + c) / 2, -(1 + c), (1 + c) / 2
+    a0, a1, a2 = 1 + a, -2 * c, 1 - a
+    b0, b1, b2, a1, a2 = b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0
+    y, x1, x2, y1, y2 = [], 0.0, 0.0, 0.0, 0.0
+    for v in x:
+        o = b0 * v + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+        x2, x1, y2, y1 = x1, v, y1, o
+        y.append(o)
+    return y
+
+
+def soft_room(x, taps=((0.035, 0.38), (0.062, 0.26), (0.094, 0.16), (0.131, 0.09))):
+    # A few decaying, low-passed echoes: rounds off the attack and gives the short blips a soft tail ("柔和"), which
+    # also carries enough energy for B20 in a sparse game.
+    tail = int(max(t for t, _ in taps) * SR) + int(0.05 * SR)
+    y = x + [0.0] * tail
+    soft = lowpass(x, 2500)
+    for t, g in taps:
+        k = int(t * SR)
+        for i, v in enumerate(soft):
+            y[i + k] += g * v
+    return y
+
+
 def db(v):
     return 20 * math.log10(max(v, 1e-9))
 
@@ -93,7 +124,7 @@ def finish(x, fc):
     # Short wooden clicks carry little energy: lift the body with a soft saturation until the clip's RMS reaches
     # about -15 dBFS (B20: loud enough in a sparse game), then low-pass again so the lift adds nothing harsh.
     drive = 1.0
-    while db(rms(x)) < -15 and drive < 4.0:
+    while db(rms(x)) < -16 and drive < 3.0:
         drive += 0.5
         x = norm(lowpass([math.tanh(drive * v / peak) for v in x], fc))
     return x
@@ -105,7 +136,7 @@ def main():
         mix = []
         for pack, name, gap in parts:
             mix += decode(os.path.join(LIB, pack, "Audio", name)) + [0.0] * int(gap * SR)
-        x = finish(lowpass(mix, fc), fc)
+        x = finish(lowpass(highpass(soft_room(mix)), fc), fc)
         with wave.open(os.path.join(OUT, kind + ".wav"), "wb") as w:
             w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR)
             w.writeframes(b"".join(struct.pack("<h", int(max(-1, min(1, v)) * 32767)) for v in x))
