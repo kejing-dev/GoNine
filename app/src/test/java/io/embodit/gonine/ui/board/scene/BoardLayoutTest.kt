@@ -49,6 +49,14 @@ class BoardLayoutTest {
         }
     }
 
+    @Test fun scene_to_board_inverts_board_to_scene() {
+        for (tilt in BoardLayout.TILTS) for (p in listOf(0, 40, 80)) {
+            val local = BoardLayout.pointLocal(p, 0.01f)
+            val back = BoardLayout.sceneToBoard(BoardLayout.boardToScene(local, tilt), tilt)
+            assertEquals(local.x, back.x, 1e-5f); assertEquals(local.y, back.y, 1e-5f); assertEquals(local.z, back.z, 1e-5f)
+        }
+    }
+
     @Test fun board_near_edge_never_moves_toward_the_cards() {
         for (tilt in BoardLayout.TILTS) {
             val nearTop = BoardLayout.boardToScene(P3(0f, 0f, BoardLayout.BOARD / 2), tilt)

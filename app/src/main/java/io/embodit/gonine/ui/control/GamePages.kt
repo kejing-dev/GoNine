@@ -74,7 +74,8 @@ internal fun PlayPage(game: GameState, settings: Settings, graph: GoGraph) {
         Phase.RESULT -> { ResultPanel(game, graph); return }
         else -> Unit
     }
-    Column(Modifier.fillMaxSize()) {
+    // Short page: blocks spread evenly over the window so no blank band exceeds 25 % of its height (profile D44).
+    Column(Modifier.fillMaxSize().padding(vertical = 8.dp), verticalArrangement = Arrangement.SpaceEvenly) {
         // Whose turn, with the seat colour.
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(22.dp).clip(CircleShape).background(if (game.toPlay == Go.BLACK) GoColors.BlackStone else GoColors.WhiteStone))
@@ -84,7 +85,7 @@ internal fun PlayPage(game: GameState, settings: Settings, graph: GoGraph) {
                     game.isVsAi -> stringResource(R.string.turn_you, colorName(game.toPlay))
                     else -> stringResource(R.string.turn_color, colorName(game.toPlay))
                 }
-                Label(turn, PicoTheme.typography.headlineSmall, "play/turn")
+                Label(turn, PicoTheme.typography.headlineMedium, "play/turn")
             }
             if (game.phase == Phase.THINKING) CircularProgressIndicator(modifier = Modifier.padding(start = 12.dp).size(22.dp))
         }
@@ -92,39 +93,39 @@ internal fun PlayPage(game: GameState, settings: Settings, graph: GoGraph) {
         val pos = game.position
         val caps = if (game.isVsAi) stringResource(R.string.captures_vs_ai, pos.capturedBy(game.humanColor), pos.capturedBy(game.aiColor))
         else stringResource(R.string.captures_local, pos.capturedByBlack, pos.capturedByWhite)
-        Label(caps, PicoTheme.typography.bodyLarge, "play/captures", color = PicoTheme.colorScheme.labelSecondary)
+        Label(caps, PicoTheme.typography.titleMedium, "play/captures", color = PicoTheme.colorScheme.labelSecondary)
         Gap(6.dp)
         // One-line status (S04 / S08).
         Box(Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
-            Label(statusLine(game), PicoTheme.typography.bodyLarge, "play/status", maxLines = 2, color = if (game.hint.name.startsWith("ILLEGAL")) PicoTheme.colorScheme.error else PicoTheme.colorScheme.labelPrimary)
+            Label(statusLine(game), PicoTheme.typography.titleMedium, "play/status", maxLines = 2, color = if (game.hint.name.startsWith("ILLEGAL")) PicoTheme.colorScheme.error else PicoTheme.colorScheme.labelPrimary)
         }
-        Gap(10.dp)
+        Gap(18.dp)
         val confirm = game.confirm
         if (confirm != null && confirm != Confirm.NEW_GAME) {
             ConfirmBox(confirm, graph)
         } else {
             val idle = game.phase in setOf(Phase.IDLE, Phase.GHOST) && !game.isAiTurn
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                SecondaryButton(stringResource(R.string.btn_undo), { flow.undo() }, "undo", Modifier.weight(1f), R.drawable.ic_undo, enabled = game.record.isNotEmpty() && game.phase in setOf(Phase.IDLE, Phase.GHOST, Phase.THINKING))
-                SecondaryButton(stringResource(R.string.btn_redo), { flow.redo() }, "redo", Modifier.weight(1f), R.drawable.ic_redo, enabled = game.redo.isNotEmpty() && idle)
-                SecondaryButton(stringResource(R.string.btn_pass), { flow.requestPass() }, "pass", Modifier.weight(1f), R.drawable.ic_skip_next, enabled = idle)
+                SecondaryButton(stringResource(R.string.btn_undo), { flow.undo() }, "undo", Modifier.weight(1f), R.drawable.ic_undo, height = 72.dp, enabled = game.record.isNotEmpty() && game.phase in setOf(Phase.IDLE, Phase.GHOST, Phase.THINKING))
+                SecondaryButton(stringResource(R.string.btn_redo), { flow.redo() }, "redo", Modifier.weight(1f), R.drawable.ic_redo, height = 72.dp, enabled = game.redo.isNotEmpty() && idle)
+                SecondaryButton(stringResource(R.string.btn_pass), { flow.requestPass() }, "pass", Modifier.weight(1f), R.drawable.ic_skip_next, height = 72.dp, enabled = idle)
             }
             Gap(10.dp)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                SecondaryButton(stringResource(if (game.hintsOn) R.string.btn_hint_on else R.string.btn_hint_off), { flow.setHints(!game.hintsOn) }, "hint", Modifier.weight(1f), R.drawable.ic_lightbulb)
+                SecondaryButton(stringResource(if (game.hintsOn) R.string.btn_hint_on else R.string.btn_hint_off), { flow.setHints(!game.hintsOn) }, "hint", Modifier.weight(1f), R.drawable.ic_lightbulb, height = 72.dp)
                 SecondaryButton(
                     stringResource(if (settings.sound) R.string.btn_mute else R.string.btn_muted),
                     { graph.settings.update { it.copy(sound = !it.sound) }; graph.sounds.apply(graph.settings.value) },
-                    "mute", Modifier.weight(1f), if (settings.sound) R.drawable.ic_volume_up else R.drawable.ic_volume_off,
+                    "mute", Modifier.weight(1f), if (settings.sound) R.drawable.ic_volume_up else R.drawable.ic_volume_off, height = 72.dp,
                 )
-                SecondaryButton(stringResource(R.string.btn_resign), { flow.requestResign() }, "resign", Modifier.weight(1f), R.drawable.ic_flag, enabled = idle)
+                SecondaryButton(stringResource(R.string.btn_resign), { flow.requestResign() }, "resign", Modifier.weight(1f), R.drawable.ic_flag, height = 72.dp, enabled = idle)
             }
         }
-        Gap(10.dp)
+        Gap(18.dp)
         val handicap = if (game.config.handicap > 0) stringResource(R.string.meta_handicap, game.config.handicap) else stringResource(R.string.meta_even)
         val meta = if (game.isVsAi) stringResource(R.string.play_meta_ai, game.moveCount, levelName(game.config.level), handicap, komiText(game.config.effectiveKomi))
         else stringResource(R.string.play_meta_local, game.moveCount, handicap, komiText(game.config.effectiveKomi))
-        Label(meta, PicoTheme.typography.bodySmall, "play/meta", color = PicoTheme.colorScheme.labelSecondary)
+        Label(meta, PicoTheme.typography.bodyMedium, "play/meta", color = PicoTheme.colorScheme.labelSecondary)
     }
 }
 
@@ -157,12 +158,12 @@ private fun ConfirmBox(c: Confirm, graph: GoGraph) {
         Confirm.NEW_GAME -> Triple(R.string.confirm_new, R.string.confirm_new_body, R.string.confirm_new_yes)
     }
     Column {
-        Label(stringResource(q), PicoTheme.typography.titleMedium, "confirm/q/$c")
-        Label(stringResource(body), PicoTheme.typography.bodyMedium, "confirm/body/$c", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
+        Label(stringResource(q), PicoTheme.typography.headlineSmall, "confirm/q/$c")
+        Label(stringResource(body), PicoTheme.typography.bodyLarge, "confirm/body/$c", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
         Gap(10.dp)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            PrimaryButton(stringResource(yes), { graph.flow.confirm() }, "confirm/yes/$c", Modifier.weight(1f))
-            SecondaryButton(stringResource(R.string.confirm_think), { graph.flow.cancelConfirm() }, "confirm/no/$c", Modifier.weight(1f), height = 56.dp)
+            PrimaryButton(stringResource(yes), { graph.flow.confirm() }, "confirm/yes/$c", Modifier.weight(1f), height = 72.dp)
+            SecondaryButton(stringResource(R.string.confirm_think), { graph.flow.cancelConfirm() }, "confirm/no/$c", Modifier.weight(1f), height = 72.dp)
         }
     }
 }
@@ -174,28 +175,28 @@ private fun ScoringPanel(game: GameState, graph: GoGraph) {
     val komi = game.config.effectiveKomi
     val deadBlocks = Go.groups(game.cells).filter { g -> g.stones.any { it in game.dead } }
     val deadColor = deadBlocks.firstOrNull()?.color
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        Label(stringResource(R.string.scoring_title), PicoTheme.typography.headlineSmall, "scoring/title")
-        Gap(6.dp)
+    Column(Modifier.fillMaxSize().padding(vertical = 8.dp), verticalArrangement = Arrangement.SpaceEvenly) {
+        Label(stringResource(R.string.scoring_title), PicoTheme.typography.headlineMedium, "scoring/title")
+        Gap(14.dp)
         val line = when {
             deadBlocks.isNotEmpty() -> stringResource(R.string.scoring_dead, deadBlocks.size, colorName(deadColor ?: Go.WHITE))
             else -> stringResource(R.string.scoring_no_dead)
         }
-        Label(line, PicoTheme.typography.bodyLarge, "scoring/dead", maxLines = 2)
-        Gap(8.dp)
+        Label(line, PicoTheme.typography.titleMedium, "scoring/dead", maxLines = 2)
+        Gap(16.dp)
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Label(stringResource(R.string.scoring_black, sc.black), PicoTheme.typography.titleMedium, "scoring/black")
-            Label(stringResource(R.string.scoring_white, sc.white, komiText(komi), komiText(sc.white + komi)), PicoTheme.typography.titleMedium, "scoring/white")
+            Label(stringResource(R.string.scoring_black, sc.black), PicoTheme.typography.titleLarge, "scoring/black")
+            Label(stringResource(R.string.scoring_white, sc.white, komiText(komi), komiText(sc.white + komi)), PicoTheme.typography.titleLarge, "scoring/white")
         }
         val margin = sc.margin(komi)
-        Label(stringResource(R.string.scoring_lead, colorName(if (margin > 0) Go.BLACK else Go.WHITE), komiText(kotlin.math.abs(margin))), PicoTheme.typography.bodyMedium, "scoring/lead", color = PicoTheme.colorScheme.labelSecondary)
-        Gap(12.dp)
+        Label(stringResource(R.string.scoring_lead, colorName(if (margin > 0) Go.BLACK else Go.WHITE), komiText(kotlin.math.abs(margin))), PicoTheme.typography.bodyLarge, "scoring/lead", color = PicoTheme.colorScheme.labelSecondary)
+        Gap(20.dp)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            PrimaryButton(stringResource(R.string.btn_accept), { graph.flow.acceptScore() }, "scoring/accept", Modifier.weight(1f), R.drawable.ic_check)
-            SecondaryButton(stringResource(R.string.btn_play_on), { graph.flow.continuePlay() }, "scoring/playOn", Modifier.weight(1f), R.drawable.ic_replay, height = 56.dp)
+            PrimaryButton(stringResource(R.string.btn_accept), { graph.flow.acceptScore() }, "scoring/accept", Modifier.weight(1f), R.drawable.ic_check, height = 72.dp)
+            SecondaryButton(stringResource(R.string.btn_play_on), { graph.flow.continuePlay() }, "scoring/playOn", Modifier.weight(1f), R.drawable.ic_replay, height = 72.dp)
         }
-        Gap(10.dp)
-        Label(stringResource(R.string.rule_area), PicoTheme.typography.bodySmall, "scoring/rule", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
+        Gap(16.dp)
+        Label(stringResource(R.string.rule_area), PicoTheme.typography.bodyMedium, "scoring/rule", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
     }
 }
 
@@ -204,23 +205,23 @@ private fun ScoringPanel(game: GameState, graph: GoGraph) {
 private fun ResultPanel(game: GameState, graph: GoGraph) {
     val r = game.result ?: return
     val stats by graph.stats.stats.collectAsStateWithLifecycle()
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Column(Modifier.fillMaxSize().padding(vertical = 8.dp), verticalArrangement = Arrangement.SpaceEvenly) {
         val head = if (r.reason == EndReason.COUNTED) stringResource(R.string.result_counted, colorName(r.winner), komiText(r.margin)) else stringResource(R.string.result_resigned, colorName(r.winner))
-        Label(head, PicoTheme.typography.headlineMedium, "result/head")
-        if (game.isVsAi) Label(stringResource(if (r.winner == game.humanColor) R.string.result_you_won else R.string.result_you_lost), PicoTheme.typography.titleMedium, "result/you")
-        Gap(4.dp)
+        Label(head, PicoTheme.typography.headlineLarge, "result/head")
+        if (game.isVsAi) Label(stringResource(if (r.winner == game.humanColor) R.string.result_you_won else R.string.result_you_lost), PicoTheme.typography.titleLarge, "result/you")
+        Gap(12.dp)
         val detail = if (r.reason == EndReason.COUNTED) stringResource(R.string.result_detail_counted, r.moves, r.black, r.white, komiText(r.komi)) else stringResource(R.string.result_detail_resigned, r.moves)
-        Label(detail, PicoTheme.typography.bodyLarge, "result/detail", color = PicoTheme.colorScheme.labelSecondary)
-        if (r.reason == EndReason.COUNTED) Label(stringResource(R.string.rule_area), PicoTheme.typography.bodySmall, "result/rule", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
-        Gap(14.dp)
+        Label(detail, PicoTheme.typography.titleMedium, "result/detail", color = PicoTheme.colorScheme.labelSecondary)
+        if (r.reason == EndReason.COUNTED) Label(stringResource(R.string.rule_area), PicoTheme.typography.bodyMedium, "result/rule", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)
+        Gap(24.dp)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            PrimaryButton(stringResource(R.string.btn_again), { graph.flow.again() }, "result/again", Modifier.weight(1f), R.drawable.ic_refresh)
-            SecondaryButton(stringResource(R.string.btn_menu), { graph.flow.toSetup(); ControlNav.page = Page.NEW }, "result/menu", Modifier.weight(1f), R.drawable.ic_home, height = 56.dp)
+            PrimaryButton(stringResource(R.string.btn_again), { graph.flow.again() }, "result/again", Modifier.weight(1f), R.drawable.ic_refresh, height = 72.dp)
+            SecondaryButton(stringResource(R.string.btn_menu), { graph.flow.toSetup(); ControlNav.page = Page.NEW }, "result/menu", Modifier.weight(1f), R.drawable.ic_home, height = 72.dp)
         }
         if (game.isVsAi) {
             Gap(10.dp)
             val l = game.config.level
-            Label(stringResource(R.string.result_stats, levelName(l), stats.won(l), stats.lost(l)), PicoTheme.typography.bodySmall, "result/stats", color = PicoTheme.colorScheme.labelSecondary)
+            Label(stringResource(R.string.result_stats, levelName(l), stats.won(l), stats.lost(l)), PicoTheme.typography.bodyMedium, "result/stats", color = PicoTheme.colorScheme.labelSecondary)
         }
     }
 }
@@ -230,16 +231,20 @@ private fun ResultPanel(game: GameState, graph: GoGraph) {
 @Composable
 internal fun NewPage(game: GameState, graph: GoGraph) {
     var draft by remember(game.gameId) { mutableStateOf(game.config) }
+    if (game.confirm == Confirm.NEW_GAME) {
+        // The confirmation is a short page of its own: spread evenly (≤ 25 % blank, profile D44).
+        Column(Modifier.fillMaxSize().padding(vertical = 8.dp), verticalArrangement = Arrangement.SpaceEvenly) {
+            Label(stringResource(R.string.tab_new), PicoTheme.typography.headlineSmall, "title/new")
+            PrimaryButton(stringResource(R.string.new_continue, game.moveCount), { graph.flow.cancelConfirm(); ControlNav.page = Page.PLAY }, "new/continue", Modifier.fillMaxWidth(), R.drawable.ic_play_arrow, height = 72.dp)
+            ConfirmBox(Confirm.NEW_GAME, graph)
+        }
+        return
+    }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Label(stringResource(R.string.tab_new), PicoTheme.typography.headlineSmall, "title/new")
         if (game.inGame && game.moveCount > 0) {
             Gap(4.dp)
             PrimaryButton(stringResource(R.string.new_continue, game.moveCount), { ControlNav.page = Page.PLAY }, "new/continue", Modifier.fillMaxWidth(), R.drawable.ic_play_arrow)
-        }
-        if (game.confirm == Confirm.NEW_GAME) {
-            Gap(6.dp)
-            ConfirmBox(Confirm.NEW_GAME, graph)
-            return@Column
         }
         Gap(6.dp)
         ChoiceRow(stringResource(R.string.new_who), "who", labelWidth = 124.dp) {
@@ -299,7 +304,7 @@ internal fun RulesPage(first: Boolean, graph: GoGraph) {
         Gap(12.dp)
         Label(stringResource(R.string.rules_mistakes), PicoTheme.typography.titleMedium, "rules/mistakes")
         listOf(R.string.mistake_1, R.string.mistake_2, R.string.mistake_3, R.string.mistake_4).forEach {
-            Label("· " + stringResource(it), PicoTheme.typography.bodyMedium, "rules/mistake", maxLines = 3, modifier = Modifier.padding(top = 4.dp))
+            Label("· " + stringResource(it), PicoTheme.typography.bodyLarge, "rules/mistake", maxLines = 3, modifier = Modifier.padding(top = 6.dp))
         }
         Gap(6.dp)
         Label(stringResource(R.string.rules_recall), PicoTheme.typography.bodySmall, "rules/recall", color = PicoTheme.colorScheme.labelSecondary, maxLines = 4)
@@ -310,11 +315,11 @@ internal fun RulesPage(first: Boolean, graph: GoGraph) {
 
 @Composable
 private fun RuleTile(title: Int, body: Int, modifier: Modifier, draw: DrawScope.() -> Unit) {
-    Row(modifier.clip(RoundedCornerShape(16.dp)).background(PicoTheme.colorScheme.fillTertiary).padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Canvas(Modifier.size(64.dp)) { draw() }
+    Row(modifier.clip(RoundedCornerShape(16.dp)).background(PicoTheme.colorScheme.fillTertiary).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Canvas(Modifier.size(84.dp)) { draw() }
         Column(Modifier.padding(start = 10.dp)) {
-            Label(stringResource(title), PicoTheme.typography.titleSmall, "rules/tile", color = GoColors.CardInk)
-            Label(stringResource(body), PicoTheme.typography.bodySmall, "rules/tileBody", color = GoColors.CardInk, maxLines = 4)
+            Label(stringResource(title), PicoTheme.typography.titleMedium, "rules/tile", color = GoColors.CardInk)
+            Label(stringResource(body), PicoTheme.typography.bodyMedium, "rules/tileBody", color = GoColors.CardInk, maxLines = 6)
         }
     }
 }

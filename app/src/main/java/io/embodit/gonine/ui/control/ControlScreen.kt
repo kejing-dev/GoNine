@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -145,7 +146,8 @@ private fun SettingsPage(settings: io.embodit.gonine.domain.game.Settings, graph
                 value = settings.volume.toFloat(),
                 onValueChange = { v -> val step = Math.round(v).coerceIn(0, 2); if (step != graph.settings.value.volume) { graph.settings.update { it.copy(volume = step) }; graph.sounds.apply(graph.settings.value) } },
                 valueRange = 0f..2f,
-                modifier = Modifier.weight(1f),
+                // B19: the default track is 32 dp tall; give it a 48 dp touch area.
+                modifier = Modifier.weight(1f).height(48.dp),
             )
             Label(stringResource(listOf(R.string.vol_low, R.string.vol_mid, R.string.vol_high)[settings.volume]), PicoTheme.typography.labelLarge, "volume/value", modifier = Modifier.padding(start = 8.dp))
         }
@@ -158,7 +160,7 @@ private fun SettingsPage(settings: io.embodit.gonine.domain.game.Settings, graph
         ChoiceRow(stringResource(R.string.set_recall_q), "recall") {
             // The button hides while the window closes and reopens straight ahead (Placement.none(), D44).
             if (WindowCtl.opening) Label(stringResource(R.string.recall_wait), PicoTheme.typography.bodyMedium, "recall/wait")
-            else SecondaryButton(stringResource(R.string.btn_recall), { WindowCtl.recall() }, "recall", icon = R.drawable.ic_center_focus_strong)
+            else SecondaryButton(stringResource(R.string.btn_recall), { WindowCtl.recall(io.embodit.gonine.domain.window.PanelPlacement.Entry.SETTINGS_BUTTON) }, "recall", icon = R.drawable.ic_center_focus_strong)
         }
         ChoiceRow(stringResource(R.string.set_about), "about") {
             Label(stringResource(R.string.about_text, graph.versionName), PicoTheme.typography.bodySmall, "about", color = PicoTheme.colorScheme.labelSecondary, maxLines = 2)

@@ -38,11 +38,11 @@ internal fun Label(text: String, style: TextStyle, where: String, modifier: Modi
 
 /** The main action of a page: 56 dp, the interaction colour. */
 @Composable
-internal fun PrimaryButton(text: String, onClick: () -> Unit, where: String, modifier: Modifier = Modifier, @DrawableRes icon: Int? = null, enabled: Boolean = true) {
+internal fun PrimaryButton(text: String, onClick: () -> Unit, where: String, modifier: Modifier = Modifier, @DrawableRes icon: Int? = null, enabled: Boolean = true, height: Dp = 56.dp) {
     Button(
         onClick = onClick, modifier = modifier, enabled = enabled,
-        size = ButtonDefaults.Regular.copy(height = 56.dp, minWidth = 160.dp),
-        shape = RoundedCornerShape(28.dp),
+        size = ButtonDefaults.Regular.copy(height = height, minWidth = 160.dp),
+        shape = RoundedCornerShape(height / 2),
         colors = ButtonDefaults.buttonColors(containerColor = PicoTheme.colorScheme.interaction, contentColor = PicoTheme.colorScheme.labelPrimaryLight),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

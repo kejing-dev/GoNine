@@ -11,6 +11,7 @@ import com.pico.spatial.core.math.Quat
 import com.pico.spatial.tracking.DataProvider
 import com.pico.spatial.tracking.hmd.HMDTrackingProvider
 import io.embodit.gonine.domain.window.LevelGate
+import io.embodit.gonine.domain.window.PanelPlacement
 import kotlin.math.asin
 
 /** Ids of the two containers. The board volume is the default container (manifest). */
@@ -47,6 +48,7 @@ object WindowCtl {
 
     var navigator: com.pico.spatial.ui.platform.containers.SpatialNavigator? = null
     private var recallPending = false
+    private var recallWhy = PanelPlacement.Entry.SETTINGS_BUTTON.why
     private var lastStepMs = 0L
 
     val isClosed: Boolean get() = panelState == "ON_DESTROY" || panelState == "never"
@@ -56,12 +58,18 @@ object WindowCtl {
         Log.i(TAG, "PANEL $event")
         if (event == "ON_DESTROY" && recallPending) {
             recallPending = false
-            openWindow("recall")
+            openWindow(recallWhy)
         }
     }
 
     /** Asks for the window; it opens once the head is level (or the head pose is unavailable). */
+    /** Reason of the latest open request; Main.kt's placement reads it through [PanelPlacement]. */
+    @Volatile
+    var lastWhy: String = PanelPlacement.Entry.LAUNCH.why
+        private set
+
     fun openWindow(why: String) {
+        lastWhy = why
         // A Shared Space volume gets no head pose (NOT_IN_FULL_SPACE): nothing to wait for, open now (critic R3 / R10).
         HeadPitch.read()
         if (HeadPitch.unsupported) {
@@ -78,8 +86,9 @@ object WindowCtl {
     }
 
     /** [重开控制窗]: close, wait for ON_DESTROY (an open straight after a close is swallowed), then open beside the board. */
-    fun recall() {
-        if (isClosed) { openWindow("recall"); return }
+    fun recall(entry: PanelPlacement.Entry = PanelPlacement.Entry.SETTINGS_BUTTON) {
+        recallWhy = PanelPlacement.why(entry)
+        if (isClosed) { openWindow(recallWhy); return }
         recallPending = true
         opening = true
         Log.i(TAG, "WINDOW recall close")

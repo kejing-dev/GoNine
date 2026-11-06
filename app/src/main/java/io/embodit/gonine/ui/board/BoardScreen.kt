@@ -76,7 +76,7 @@ fun BoardScreen() {
     DisposableEffect(navigator) {
         WindowCtl.navigator = navigator
         FrameHooks.onFrame = { WindowCtl.stepGate() }
-        if (WindowCtl.isClosed) WindowCtl.openWindow("launch")
+        if (WindowCtl.isClosed) WindowCtl.openWindow(io.embodit.gonine.domain.window.PanelPlacement.why(io.embodit.gonine.domain.window.PanelPlacement.Entry.LAUNCH))
         onDispose {
             FrameHooks.onFrame = null
             WindowCtl.cancel()
@@ -112,7 +112,7 @@ private fun onBoardEvent(e: SceneEvent, graph: GoGraph) {
                 // S10: with the control window closed, the first pinch only brings it back.
                 if (WindowCtl.isClosed && !WindowCtl.opening) {
                     Log.i(GoGraph.TAG, "TAP consumed: reopen panel")
-                    WindowCtl.openWindow("tap")
+                    WindowCtl.openWindow(io.embodit.gonine.domain.window.PanelPlacement.why(io.embodit.gonine.domain.window.PanelPlacement.Entry.PINCH_VOLUME))
                     return@run
                 }
                 when (e) {
@@ -191,6 +191,9 @@ private fun BoardView(state: BoardUiState, game: GameState, onEvent: (SceneEvent
 }
 
 private var loggedDp = false
+private var loggedFont = false
+private const val CARD_GLYPH_M = 0.018f
+private const val CJK_GLYPH_RATIO = 0.88f
 
 /** Size of a card in dp for its physical size, so the 1.8 cm text is really 1.8 cm (D13). */
 @Composable
@@ -205,8 +208,9 @@ private fun metresToDp(m: Float): Float {
 private fun Card(widthM: Float, text: String, onTap: (() -> Unit)? = null) {
     val w = metresToDp(widthM)
     val h = metresToDp(BoardLayout.CARD_H)
-    // Glyph height ≈ 0.72 × font size: a 1.8 cm capital needs a font of 1.8 / 0.72 = 2.5 cm.
-    val font = metresToDp(0.018f / 0.72f) * 0.62f
+    // mustPass M5: 1.8 cm glyphs. A CJK glyph is ≈ 0.88 × the font size, so the font is 1.8 / 0.88 = 2.05 cm.
+    val font = metresToDp(CARD_GLYPH_M / CJK_GLYPH_RATIO)
+    if (!loggedFont) { loggedFont = true; Log.i(BoardScene.TAG, "CARD font ${"%.1f".format(font)} sp, glyph ≈ ${"%.1f".format(CARD_GLYPH_M * 1000)} mm (CJK) / ${"%.1f".format(CARD_GLYPH_M / CJK_GLYPH_RATIO * 0.72f * 1000)} mm (Latin capitals)") }
     Box(
         modifier = Modifier.widthIn(min = w.dp).height(h.dp).clip(RoundedCornerShape((h * 0.3f).dp)).background(GoColors.CardBack).then(if (onTap != null) Modifier.clickable { onTap() } else Modifier).padding(horizontal = (h * 0.3f).dp),
         contentAlignment = Alignment.Center,
@@ -235,7 +239,7 @@ private fun SeatCard(game: GameState) {
     }
     Card(BoardLayout.SEAT_CARD_W, text, onTap = {
         Log.i(BoardScene.TAG, "CARD seat tapped: recall panel")
-        WindowCtl.recall()
+        WindowCtl.recall(io.embodit.gonine.domain.window.PanelPlacement.Entry.SEAT_CARD)
     })
 }
 

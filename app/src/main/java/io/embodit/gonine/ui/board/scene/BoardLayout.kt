@@ -97,6 +97,26 @@ object BoardLayout {
         return P3(t.x + pivot.x, y + pivot.y, z + pivot.z)
     }
 
+    /** Inverse of [boardToScene] (the tilt is a rigid motion). */
+    fun sceneToBoard(scene: P3, tiltDeg: Int): P3 {
+        val pivot = tiltPivot(tiltDeg)
+        val y = scene.y - pivot.y
+        val z = scene.z - pivot.z
+        val a = tiltRad(tiltDeg)
+        val ly = y * cos(a) + z * sin(a)
+        val lz = -y * sin(a) + z * cos(a)
+        return P3(scene.x - pivot.x, ly, lz + BOARD / 2f)
+    }
+
+    /** Does the segment a–b pass through the tilted board slab itself (not its axis-aligned bound)? */
+    fun segmentHitsBoard(a: P3, b: P3, tiltDeg: Int, steps: Int = 400): Boolean {
+        for (i in 0..steps) {
+            val q = sceneToBoard(a.lerp(b, i / steps.toFloat()), tiltDeg)
+            if (kotlin.math.abs(q.x) <= BOARD / 2 && kotlin.math.abs(q.z) <= BOARD / 2 && q.y <= STONE_T && q.y >= -BOARD_THICK) return true
+        }
+        return false
+    }
+
     /** Where tiltRoot sits in scene space for [tiltDeg]. */
     fun tiltPivot(tiltDeg: Int) = P3(0f, BOARD_THICK * cos(tiltRad(tiltDeg)), PIVOT_Z)
 
