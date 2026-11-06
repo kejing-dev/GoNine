@@ -15,6 +15,7 @@ class SpatialApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         graph = GoGraph(this)
+        io.embodit.gonine.ui.board.input.BoardInputLog.attach(this)
         // Background / foreground: stop thinking and save when the last activity stops (design lifecycle).
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityStarted(activity: Activity) { if (started++ == 0) graph.flow.onForeground() }

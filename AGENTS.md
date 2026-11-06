@@ -1,6 +1,6 @@
 # 九路围棋 Go Nine — project guidance
 
-9 x 9 Go for PICO OS 6 Shared Space, PICO Spatial SDK 6.1.9, package `io.embodit.gonine`, v0.1.2.
+9 x 9 Go for PICO OS 6 Shared Space, PICO Spatial SDK 6.1.9, package `io.embodit.gonine`, v0.1.5.
 Design contract: factory `apps/go-nine/design-package.json` (v1 = A12 main loop; `v2[]` — lessons, SGF, skin 2,
 review, coordinates, one-tap — is NOT built).
 
@@ -12,6 +12,11 @@ Two containers:
   对局 / 新局 / 规则 / 设置. Drag / close / minimise are the system's controls; no custom handle anywhere (D21).
 
 ## Rules that stay in force
+- Board input goes through `ui/board/input/BoardInput.kt` (factory template board-input, D50): taps, short drags as taps,
+  hover hints (`BoardScene.setHover`: ring on the point, stone glows, clears after 250 ms). Do not add
+  detectSpatialTapGesture / DragGesture elsewhere. Input log mirrored to files/input-log.txt (`run-as … cat`).
+- Sounds are CC0 recordings (Kenney, third_party/kenney/License-*.txt), imported by tools/import_cc0.py; list in the
+  factory's apps/go-nine/build/sound-sources.md.
 - SpatialUI + PicoTheme only (`GoTheme`); no Material. Copy in `res/values` + `values-zh`; in-app language via a
   ContextWrapper (`GoTheme.localized`). Attachment cards wrap their content in `AppRoot` (separate composition).
 - Rules only in `domain/rules/GoRules.kt` (positional superko, no suicide, area scoring). AI only in
@@ -47,7 +52,7 @@ col 0 = A (left); `BoardLayout.pointLocal` / `pointScene`. The human's bowl is o
 export JAVA_HOME=~/.pico/primer-cli/jdk/jdk-21.0.13+9/Contents/Home
 ./gradlew :app:assembleDebug :app:testDebugUnitTest
 ./gradlew :app:testDebugUnitTest --tests '*StrengthTest*' -Pstrength=100   # AI strength, slow
-python3 tools/make_sounds.py --check                                       # regenerate sounds (peak -1, RMS ≥ -20)
+python3 tools/import_cc0.py --check   # CC0 recordings from ~/Downloads/cc0-sounds (Kenney) → assets/sounds (low-pass, peak -1, RMS ≥ -20)
 python3 tools/loudness_mix.py <factory>/apps/go-nine/qa/loudness-vX.wav  # B20 evidence
 SERIAL=emulator-5564 tools/harness/shoot_all.sh <outdir>                   # every QA state, after each build
 java -Djava.awt.headless=true tools/BuildIcon.java design/icon/icon-512.png 512

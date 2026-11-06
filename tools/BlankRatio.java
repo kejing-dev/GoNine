@@ -27,13 +27,18 @@ public class BlankRatio {
             for (int y = 0; y < h; y++) if (rowCount[y] > maxR * 0.5) { if (y0 < 0) y0 = y; y1 = y; }
             if (x0 < 0 || y0 < 0) { System.out.println(f + ": window not found"); continue; }
             int ix0 = x0 + (x1 - x0) / 20, ix1 = x1 - (x1 - x0) / 20;
-            int band = 0, best = 0;
-            for (int y = y0 + (y1 - y0) / 40; y <= y1 - (y1 - y0) / 40; y++) {
+            // Unified rule (build.md 2026-11-05): blank OUTSIDE the content block, top + bottom together, ≤ 25 %;
+            // inside the block no band > 20 %. Content rows = rows with ink (text, icons, button fills).
+            int first = -1, last = -1, band = 0, inner = 0;
+            int ys = y0 + (y1 - y0) / 60, ye = y1 - (y1 - y0) / 60;
+            for (int y = ys; y <= ye; y++) {
                 boolean blank = true;
-                for (int x = ix0; x <= ix1 && blank; x += 2) if (lum(img.getRGB(x, y)) < 150) blank = false;
-                band = blank ? band + 1 : 0; best = Math.max(best, band);
+                for (int x = ix0; x <= ix1 && blank; x += 2) { int l = lum(img.getRGB(x, y)); if (l < 150 || l > 245) blank = false; }
+                if (!blank) { if (first < 0) first = y; if (first >= 0 && band > inner) inner = band; band = 0; last = y; } else if (first >= 0) band++;
             }
-            System.out.printf("%s: window %dx%d at (%d,%d), biggest blank band %d px = %.0f %%%n", new File(f).getName(), x1 - x0, y1 - y0, x0, y0, best, 100.0 * best / (y1 - y0));
+            int h0 = y1 - y0;
+            int outside = first < 0 ? h0 : (first - y0) + (y1 - last);
+            System.out.printf("%s: window %dx%d, outside blank (top+bottom) %.0f %%, biggest inner band %.0f %%%n", new File(f).getName(), x1 - x0, h0, 100.0 * outside / h0, 100.0 * inner / h0);
         }
     }
 }

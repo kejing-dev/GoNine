@@ -72,6 +72,11 @@ internal class SceneResources {
     val light: Material = unlit(GoColors.LibertyGlow)
     val cubeBlack: Material = unlit(GoColors.BlackStone, opacity = 0.7f)
     val cubeWhite: Material = unlit(GoColors.WhiteStone, opacity = 0.7f)
+    /** Hover hint (D50): a soft white ring on the point the pointer rests on. */
+    val hover: Material = unlit(GoColors.HoverRing, opacity = 0.75f)
+    /** A stone under the pointer glows a little (same colour, more light; never another colour, D44). */
+    val blackHover: Material = pbr(GoColors.BlackStone, roughness = 0.32f, glow = 0.6f)
+    val whiteHover: Material = pbr(GoColors.WhiteStone, roughness = 0.5f, glow = 0.28f)
 
     // ---- board face texture ----
     private val faceTexture: TextureResource = TextureResource.create(BoardTexture.draw(1024)).keep()
@@ -104,6 +109,7 @@ internal class SceneResources {
     // gate:allow geometry last-move dot: abstract marker
     val dot: MeshResource = MeshResource.createCylinder(radius = 0.0045f, height = 0.0016f).keep()
     val ring: MeshResource = MeshResource.createTorus(outerRingRadius = 0.022f, innerRingRadius = 0.0185f).keep()
+    val hoverRing: MeshResource = MeshResource.createTorus(outerRingRadius = 0.021f, innerRingRadius = 0.0175f).keep()
     // gate:allow geometry liberty light: abstract glowing marker (design spatialOnly 气光点)
     val lightBall: MeshResource = MeshResource.createSphere(radius = BoardLayout.LIGHT_D / 2f).keep()
     // gate:allow geometry scoring cube: abstract territory marker (design 数目方块)

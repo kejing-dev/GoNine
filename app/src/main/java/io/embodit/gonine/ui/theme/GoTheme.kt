@@ -36,6 +36,7 @@ object GoColors {
     val LibertyGlow = Color(0xFFB04E00) // design-style: fixed-figma-color 气光点 (design #FFD08A was 1.17:1 on kaya; deep amber 3.18:1)
     val HintGreen = Color(0xFF17663A) // design-style: fixed-figma-color 推荐绿圈 (4.18:1 on kaya)
     val LastMove = Color(0xFF9A3524) // design-style: fixed-figma-color last-move dot
+    val HoverRing = Color(0xFFFFFBF0) // design-style: fixed-figma-color hover hint ring (warm white)
     val Brand = Color(0xFF4F6E78) // design-style: fixed-figma-color icon background
 
     /** Card ink on the board's glass cards: solid, not Vibrant grey (D13). */

@@ -15,7 +15,7 @@ import io.embodit.gonine.domain.game.Mode
 import io.embodit.gonine.domain.game.Phase
 import io.embodit.gonine.domain.rules.Go
 import io.embodit.gonine.domain.rules.Position
-import io.embodit.gonine.ui.board.BoardInput
+import io.embodit.gonine.ui.board.BoardInputPath
 import io.embodit.gonine.ui.board.SceneEvent
 import io.embodit.gonine.ui.board.scene.BoardScene
 import io.embodit.gonine.ui.board.scene.BoardSceneHolder
@@ -89,6 +89,7 @@ class DebugCommandReceiver : BroadcastReceiver() {
             "reopen" -> WindowCtl.openWindow("debug")
             "recall" -> WindowCtl.recall()
             "bench" -> bench()
+            "hover" -> BoardSceneHolder.scene?.let { sc -> sc.hoverHold = a != "off"; sc.setHover(if (a == "off") null else pt()) }
             "flash" -> BoardScene.flashSeconds = if (a == "hold") 3f else 0.3f
             "icons" -> renderIcons(context)
             "state", "dump" -> Log.i(TAG, "DUMP phase=${flow.current.phase} toPlay=${flow.current.toPlay} moves=${flow.current.moveCount} ghost=${flow.current.ghost?.let { Go.name(it) }} hint=${flow.current.hint} confirm=${flow.current.confirm} dead=${flow.current.dead.size} result=${flow.current.result} panel=${WindowCtl.panelState} page=${ControlNav.page} head=${HeadPitch.support}/${HeadPitch.last}\n${board(flow.current.cells)}")
@@ -100,7 +101,7 @@ class DebugCommandReceiver : BroadcastReceiver() {
 
     /** Through the board's own input path when the board is up (same as a pinch), else straight to the flow. */
     private fun input(e: SceneEvent, fallback: () -> Unit) {
-        BoardInput.handler?.invoke(e) ?: fallback()
+        BoardInputPath.handler?.invoke(e) ?: fallback()
     }
 
     private fun goto(id: String, graph: GoGraph) {

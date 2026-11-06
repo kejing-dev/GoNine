@@ -18,7 +18,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,8 +32,11 @@ import com.pico.spatial.ui.design.Text
 import com.pico.spatial.ui.foundation.content.SpatialView
 import com.pico.spatial.ui.foundation.dsl.registerSystem
 import com.pico.spatial.ui.foundation.dsl.unregisterSystem
-import com.pico.spatial.ui.foundation.gesture.TargetEntity
-import com.pico.spatial.ui.foundation.gesture.detectSpatialTapGesture
+import com.pico.spatial.ui.geometry.Offset3D
+import io.embodit.gonine.ui.board.input.BoardInputListener
+import io.embodit.gonine.ui.board.input.InputSource
+import io.embodit.gonine.ui.board.input.TargetResolver
+import io.embodit.gonine.ui.board.input.boardInput
 import com.pico.spatial.ui.platform.LengthUnit
 import com.pico.spatial.ui.platform.LocalPhysicalLengthConverter
 import com.pico.spatial.ui.platform.containers.LocalSpatialNavigator
@@ -91,14 +93,29 @@ fun BoardScreen() {
 
     val handle: (SceneEvent) -> Unit = { e -> onBoardEvent(e, graph) }
     DisposableEffect(Unit) {
-        BoardInput.handler = handle
-        onDispose { if (BoardInput.handler === handle) BoardInput.handler = null }
+        BoardInputPath.handler = handle
+        onDispose { if (BoardInputPath.handler === handle) BoardInputPath.handler = null }
     }
     BoardView(ui, game, handle)
 }
 
+/** What a pinch / trigger / gaze can land on (resolved up the parent chain by the board-input template). */
+sealed interface GoTarget {
+    data class Point(val p: Int) : GoTarget
+    data object Bowl : GoTarget
+}
+
+/** Entity names the scene sets: `pt:<p>` pads, `st:<p>` stones, `ghost:<p>` the ghost stone, `bowl:` / `lid:` holders. */
+object GoTargets : TargetResolver<GoTarget> {
+    override fun resolve(entity: com.pico.spatial.core.ecs.Entity): GoTarget? {
+        val n = entity.getName()
+        for (prefix in listOf(BoardScene.PAD, BoardScene.STONE, BoardScene.GHOST)) if (n.startsWith(prefix)) return n.removePrefix(prefix).toIntOrNull()?.let { GoTarget.Point(it) }
+        return if (n.startsWith("bowl:") || n.startsWith("lid:")) GoTarget.Bowl else null
+    }
+}
+
 /** The board's input path; debug commands use it too, so they see exactly what a pinch sees (S10 included). */
-object BoardInput {
+object BoardInputPath {
     @Volatile
     var handler: ((SceneEvent) -> Unit)? = null
 }
@@ -153,18 +170,21 @@ private fun BoardView(state: BoardUiState, game: GameState, onEvent: (SceneEvent
     SpatialView(
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(Unit) {
-                detectSpatialTapGesture(context = context, targetedToEntity = TargetEntity.any()) { tap ->
-                    val name = tap.targetEntity?.getName()
-                    val point = scene.pointOf(name)
-                    Log.i(BoardScene.TAG, "TAP target=$name point=${point?.let { Go.name(it) }}")
-                    when {
-                        point != null -> currentOnEvent(SceneEvent.TapPoint(point))
-                        scene.isBowlOrLid(name) -> currentOnEvent(SceneEvent.TapBowl)
-                        else -> currentOnEvent(SceneEvent.TapEmpty)
+            // Factory template board-input (D50): taps, short drags as taps, hover hints, all three inputs.
+            .boardInput(GoTargets, object : BoardInputListener<GoTarget> {
+                override fun onTap(target: GoTarget?, source: InputSource, position: Offset3D?) {
+                    Log.i(BoardScene.TAG, "TAP src=${source.label} target=$target")
+                    when (target) {
+                        is GoTarget.Point -> currentOnEvent(SceneEvent.TapPoint(target.p))
+                        GoTarget.Bowl -> currentOnEvent(SceneEvent.TapBowl)
+                        null -> currentOnEvent(SceneEvent.TapEmpty)
                     }
                 }
-            },
+
+                override fun onHover(target: GoTarget?, source: InputSource) {
+                    scene.setHover((target as? GoTarget.Point)?.p)
+                }
+            }),
         attachments = {
             AttachmentPanel(id = BoardLayout.CARD_SEAT) { AppRoot { SeatCard(game) } }
             AttachmentPanel(id = BoardLayout.CARD_RIGHT) { AppRoot { CountCard(game, right = true) } }

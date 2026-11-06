@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.pico.spatial.core.ecs.CollisionComponent
 import com.pico.spatial.core.ecs.Entity
+import com.pico.spatial.core.ecs.HoverEffectComponent
 import com.pico.spatial.core.ecs.InteractableComponent
 import com.pico.spatial.core.ecs.ModelComponent
 import com.pico.spatial.core.ecs.ModelEntity
@@ -56,6 +57,13 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
     private val deadCrosses = ArrayList<Entity>()
     private var lastDot: ModelEntity? = null
     private val rings = ArrayList<ModelEntity>()
+    private var hoverRing: ModelEntity? = null
+    private var hoverPoint: Int? = null
+    private var hoverAt = -1f
+
+    /** Debug `hover <pt>` keeps the hint up until `hover off`, so QA can photograph it (D36). */
+    @Volatile
+    var hoverHold = false
     private val lights = ArrayList<ModelEntity>()
     private val cubes = arrayOfNulls<ModelEntity>(Go.SIZE)
     private val flyers = ArrayList<ModelEntity>()
@@ -139,6 +147,7 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
             transform().setPosition(Vector3(at.x, at.y, at.z))
             components.set(CollisionComponent(collisionShape = listOf(shape), physicsMaterial = r.physics))
             components.set(InteractableComponent())
+            components.set(HoverEffectComponent())
         }
         parent.addChild(e)
         return e
@@ -197,6 +206,7 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
         repeat(DEAD_CROSSES) { deadCrosses += crossEntity(r, "dead:$it") }
         lastDot = model(r.dot, r.lastDot, P3(0f, 0f, 0f), "lastDot", boardRoot).apply { enabled = false }
         repeat(3) { rings += model(r.ring, r.hintRing, P3(0f, 0f, 0f), "hint:$it", boardRoot).apply { enabled = false } }
+        hoverRing = model(r.hoverRing, r.hover, P3(0f, 0f, 0f), "hoverRing", boardRoot).apply { enabled = false }
         repeat(LIGHTS) { lights += model(r.lightBall, r.light, P3(0f, 0f, 0f), "light:$it", boardRoot).apply { enabled = false } }
         repeat(FLYERS) { flyers += model(r.stone, r.black, P3(0f, 0f, 0f), "flyer:$it", root).apply { lensScale(this); enabled = false } }
     }
@@ -522,6 +532,7 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
             cubesShownAt = -1f
             cubes.forEach { it?.enabled = false }
         }
+        drawHover(r)
         // The stone floating over the bowl of the side to move.
         val waiting = s.phase in setOf(Phase.IDLE, Phase.GHOST, Phase.THINKING) && timeline == null
         for (right in listOf(true, false)) {
@@ -554,6 +565,7 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
         timeline?.advance(dt)
         if (flashUntil > 0f && clock >= flashUntil) { flashUntil = 0f; flashCross?.enabled = false }
         if (state.owner != null) revealCubes()
+        if (hoverPoint != null && !hoverHold && clock - hoverAt > 0.25f) { hoverPoint = null; res?.let { drawHover(it) } }
         // The waiting stone bobs a little over its bowl; the lights breathe.
         for (right in listOf(true, false)) {
             val m = mouth[right] ?: continue
@@ -571,6 +583,33 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
     }
 
     private var lastTimelineState = false
+
+    /**
+     * Hover hint (profile D50): the pointer / gaze rests on point [p] (null = nothing). Shows a soft ring on the point
+     * at once (the next frame, well within 80 ms) and lights a stone standing there; it clears 250 ms after the last
+     * hover event, because the system does not always send a "left" event. Never touches game state.
+     */
+    fun setHover(p: Int?) {
+        if (p != null) hoverAt = clock
+        if (p == hoverPoint) return
+        hoverPoint = p
+        res?.let { drawHover(it) }
+    }
+
+    private fun drawHover(r: SceneResources) {
+        val ring = hoverRing ?: return
+        val p = hoverPoint
+        for (q in 0 until Go.SIZE) {
+            val h = stones[q] ?: continue
+            if (!h.holder.enabled || shown[q] == Go.EMPTY || q in state.dead || state.owner != null) continue
+            setMat(h.model, if (q == p) (if (shown[q] == Go.BLACK) r.blackHover else r.whiteHover) else colorMat(shown[q], r))
+        }
+        if (p == null || timeline != null) { ring.enabled = false; return }
+        val lift = if (shown[p] != Go.EMPTY) BoardLayout.STONE_T + 0.002f else 0.002f
+        val at = BoardLayout.pointLocal(p, lift)
+        ring.transform().setPosition(Vector3(at.x, at.y, at.z))
+        ring.enabled = true
+    }
 
     /** Which point, if any, an entity name denotes (pads, stones and the ghost all map to their point). */
     fun pointOf(name: String?): Int? {
