@@ -164,10 +164,13 @@ internal class BoardScene(private val onEvent: (SceneEvent) -> Unit) {
     }
 
     private fun buildPoint(r: SceneResources, p: Int) {
-        // v0.1.6 eye-hand hover (headset log: no HOVER / POINTER events reach the app in a Shared Space volume, only
-        // TAPs): the system draws its own hover highlight, and only on an entity that has a mesh. So the 0.92-pitch
-        // pad is now a mesh (a 0.6 mm tile, nearly transparent) carrying collider + Interactable + HoverEffect itself.
-        pads[p] = hoverable(model(r.padTile, r.padMat, BoardLayout.pointLocal(p, BoardLayout.POINT_PAD_T / 2f), "$PAD$p", boardRoot), r.padShape, r)
+        // v0.1.8 hover (headset: the bowls lit up, the points did not). The bowls are a collider holder with a visible
+        // child mesh; the points were a 4 %-opaque tile, so the system highlight had nothing to draw on. Now the same as
+        // the bowls: the 0.92-pitch pad collider (+ Interactable + HoverEffect) holds a small visible marker
+        // (Ø 9 mm, 1.5 mm proud of the face, kaya-brown; ink on the 5 star points), which the system highlights.
+        val pad = collider("$PAD$p", r.padShape, BoardLayout.pointLocal(p, BoardLayout.POINT_PAD_T / 2f), boardRoot, r)
+        model(r.pointMarker, if (p in Go.STARS) r.markerStar else r.marker, P3(0f, BoardLayout.MARKER_Y - BoardLayout.POINT_PAD_T / 2f, 0f), "marker:$p", pad)
+        pads[p] = pad
         // The stone: collider + HoverEffect on the lens mesh itself (scaled; the shape is a cube so it scales to the lens).
         val m = hoverable(model(r.stone, r.black, BoardLayout.pointLocal(p, BoardLayout.STONE_REST), "$STONE$p", boardRoot), r.stoneCube, r)
         lensScale(m)

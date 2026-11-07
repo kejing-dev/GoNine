@@ -9,12 +9,24 @@ import io.embodit.gonine.ui.board.SoundKind
 import kotlin.random.Random
 
 /**
- * CC0 recordings (Kenney impact / casino / interface packs, imported and softened by tools/import_cc0.py) from
+ * CC0 recordings — Go stones on a wooden board from freesound (tools/import_stones.py), quiet UI cues from Kenney
+ * interface-sounds (tools/import_cc0.py) — from
  * `assets/sounds/<kind>.wav`, plus `<kind>_b.wav` as a second take where present, through a SoundPool. Placing
  * stones alternates takes and plays at a random rate of ±5 % that never repeats back to back (profile D51).
  * [apply] follows the settings: sound off mutes, the three volume steps scale the gain. No ambient loop (B24).
  */
 class SoundPlayer(private val context: Context) {
+    companion object {
+        /**
+         * v0.1.8 (user, headset: 「预选声音太大太吵，要不就不要声音了」): the stones are the loud ones; UI cues sit clearly
+         * under them, and picking / pre-selection / hover have no sound at all (no pick.wav).
+         */
+        val KIND_GAIN = mapOf(
+            SoundKind.ALERT to 0.45f, SoundKind.WIN to 0.5f, SoundKind.LOSE to 0.5f,
+            SoundKind.ILLEGAL to 0.5f, SoundKind.PASS to 0.6f, SoundKind.SCORE to 0.6f,
+        )
+    }
+
     @Volatile private var enabled = true
     @Volatile private var gain = 1f
 
@@ -58,6 +70,7 @@ class SoundPlayer(private val context: Context) {
             if (kotlin.math.abs(rate - lastRate) < 0.015f) rate = if (rate + 0.02f <= 1.05f) rate + 0.02f else rate - 0.02f
             lastRate = rate
         }
-        pool.play(id, gain, gain, 1, 0, rate)
+        val g = gain * (KIND_GAIN[kind] ?: 1f)
+        pool.play(id, g, g, 1, 0, rate)
     }
 }

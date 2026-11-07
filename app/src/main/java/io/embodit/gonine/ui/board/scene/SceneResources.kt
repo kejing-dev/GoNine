@@ -72,8 +72,9 @@ internal class SceneResources {
     val light: Material = unlit(GoColors.LibertyGlow)
     val cubeBlack: Material = unlit(GoColors.BlackStone, opacity = 0.7f)
     val cubeWhite: Material = unlit(GoColors.WhiteStone, opacity = 0.7f)
-    /** The point pads' own mesh (for the system hover highlight): kaya-tinted, almost invisible at rest. */
-    val padMat: Material = unlit(GoColors.Kaya, opacity = 0.04f)
+    /** Point markers (the system hover highlight draws on them): kaya-brown dots, ink on the star points. */
+    val marker: Material = pbr(GoColors.KayaEdge, roughness = 0.6f, glow = 0.06f)
+    val markerStar: Material = pbr(GoColors.GridInk, roughness = 0.6f, glow = 0.04f)
     /** Hover hint (D50): a soft white ring on the point the pointer rests on. */
     val hover: Material = unlit(GoColors.HoverRing, opacity = 0.75f)
     /** A stone under the pointer glows a little (same colour, more light; never another colour, D44). */
@@ -114,8 +115,8 @@ internal class SceneResources {
     val hoverRing: MeshResource = MeshResource.createTorus(outerRingRadius = 0.021f, innerRingRadius = 0.0175f).keep()
     // gate:allow geometry liberty light: abstract glowing marker (design spatialOnly 气光点)
     val lightBall: MeshResource = MeshResource.createSphere(radius = BoardLayout.LIGHT_D / 2f).keep()
-    // gate:allow geometry point pad tile: invisible-at-rest hover target for the system highlight (eye-hand, D50)
-    val padTile: MeshResource = MeshResource.createBox(Vector3(BoardLayout.POINT_PAD, 0.0006f, BoardLayout.POINT_PAD), cornerRadius = 0.004f).keep()
+    // gate:allow geometry point marker: small dot on every intersection, the visible mesh the system hover highlights (D50)
+    val pointMarker: MeshResource = MeshResource.createCylinder(radius = BoardLayout.MARKER_R, height = BoardLayout.MARKER_H).keep()
     // gate:allow geometry scoring cube: abstract territory marker (design 数目方块)
     val cube: MeshResource = MeshResource.createBox(Vector3(BoardLayout.CUBE, BoardLayout.CUBE_T, BoardLayout.CUBE), cornerRadius = 0.0015f).keep()
 

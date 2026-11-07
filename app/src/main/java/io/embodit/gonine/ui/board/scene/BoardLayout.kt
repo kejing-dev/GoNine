@@ -47,6 +47,11 @@ object BoardLayout {
     const val POINT_PAD = PITCH * 0.92f
     const val POINT_PAD_T = 0.003f
 
+    // Point markers (v0.1.8 hover targets): Ø 9 mm, 1.5 mm thick, centred 1.25 mm above the face (top 2 mm proud).
+    const val MARKER_R = 0.0045f
+    const val MARKER_H = 0.0015f
+    const val MARKER_Y = 0.00125f
+
     // Bowls Ø 11.5 x 8 cm and lids Ø 12 x 1.5 cm turned over in front of them.
     const val BOWL_R = 0.0575f
     const val BOWL_H = 0.08f

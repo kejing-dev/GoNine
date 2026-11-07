@@ -1,6 +1,6 @@
 # 九路围棋 Go Nine — project guidance
 
-9 x 9 Go for PICO OS 6 Shared Space, PICO Spatial SDK 6.1.9, package `io.embodit.gonine`, v0.1.7.
+9 x 9 Go for PICO OS 6 Shared Space, PICO Spatial SDK 6.1.9, package `io.embodit.gonine`, v0.1.8.
 Design contract: factory `apps/go-nine/design-package.json` (v1 = A12 main loop; `v2[]` — lessons, SGF, skin 2,
 review, coordinates, one-tap — is NOT built).
 
@@ -52,7 +52,7 @@ col 0 = A (left); `BoardLayout.pointLocal` / `pointScene`. The human's bowl is o
 export JAVA_HOME=~/.pico/primer-cli/jdk/jdk-21.0.13+9/Contents/Home
 ./gradlew :app:assembleDebug :app:testDebugUnitTest
 ./gradlew :app:testDebugUnitTest --tests '*StrengthTest*' -Pstrength=100   # AI strength, slow
-python3 tools/import_cc0.py --check   # CC0 recordings from ~/Downloads/cc0-sounds (Kenney) → assets/sounds (low-pass, peak -1, RMS ≥ -20)
+python3 tools/import_stones.py   # Go stones on wood (freesound CC0) → place*/capture*; python3 tools/import_cc0.py → quiet UI cues
 python3 tools/loudness_mix.py <factory>/apps/go-nine/qa/loudness-vX.wav  # B20 evidence
 SERIAL=emulator-5564 tools/harness/shoot_all.sh <outdir>                   # every QA state, after each build
 java -Djava.awt.headless=true tools/BuildIcon.java design/icon/icon-512.png 512

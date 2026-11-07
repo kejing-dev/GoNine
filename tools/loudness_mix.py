@@ -13,6 +13,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SND = os.path.join(ROOT, "app", "src", "main", "assets", "sounds")
 SR = 44100
 GAIN = 1.0  # SoundPlayer: High = 1.0 (default), Medium 0.7, Low 0.45
+# SoundPlayer.KIND_GAIN: UI cues sit clearly under the stones (v0.1.8, user: 「预选声音太大太吵」); pick / hover are silent.
+KIND_GAIN = {"alert": 0.45, "win": 0.5, "lose": 0.5, "illegal": 0.5, "pass": 0.6, "score": 0.6}
 
 
 def load(name):
@@ -24,7 +26,7 @@ def load(name):
 EVENTS = []
 t = 0.4
 for turn in range(9):
-    EVENTS += [(t, "pick"), (t + 0.9, ["place", "place_2", "place_3"][turn % 3]), (t + 2.0, ["place_2", "place", "place_3"][turn % 3])]
+    EVENTS += [(t, "pick"), (t + 0.9, ["place", "place_2", "place_3"][turn % 3]), (t + 2.0, ["place_2_b", "place_b", "place_3_b"][turn % 3])]
     if turn in (3, 6):
         EVENTS += [(t + 2.35, "capture")]
     if turn == 4:
@@ -41,7 +43,9 @@ def main():
     mix = [0.0] * n
     seg = [False] * n
     for at, name in EVENTS:
-        x = load(name)
+        if not os.path.exists(os.path.join(SND, name + ".wav")):
+            continue  # silent by design (pick)
+        x = [v * KIND_GAIN.get(name, 1.0) for v in load(name)]
         i0 = int(at * SR)
         for i, v in enumerate(x):
             if i0 + i < n:

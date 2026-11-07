@@ -15,18 +15,12 @@ LIB = os.path.expanduser("~/Downloads/cc0-sounds")
 SR = 44100
 
 # kind: ([(pack, file, gap_after_s)], low-pass Hz, note)
+# v0.1.8: stones (place*, capture*) come from tools/import_stones.py (freesound CC0 Go-stone recordings); the pick sound
+# is gone (user: selection / pre-selection / hover silent). This script now only makes the quiet UI cues below.
 SOURCES = {
     # v0.1.6 (user, headset: 「声音需要柔和一点，轻快一点，类似下棋之前确定的提示音」, profile D51 「好听优先于写实」):
     # short, light, soft, slightly pitched — interface-sound blips in the 0.6–1.5 kHz range, no low thump, no hard knock.
     # More neighbours = a slightly lower note (instead of the old "more muffled").
-    "place":     ([("kenney_interface-sounds", "glass_003.ogg", 0)], 4000, "落子（无邻子）：清亮的小「叮」，约 1.1 kHz，轻快"),
-    "place_b":   ([("kenney_interface-sounds", "select_003.ogg", 0)], 4000, "落子第二个变体（无邻子）：轻快的选择音，约 1.4 kHz"),
-    "place_2":   ([("kenney_interface-sounds", "glass_006.ogg", 0)], 4000, "落子（1–2 颗邻子）：柔和的「叮」，约 0.95 kHz"),
-    "place_2_b": ([("kenney_interface-sounds", "select_004.ogg", 0)], 4000, "落子第二个变体（1–2 颗邻子）：柔的选择音，约 0.9 kHz"),
-    "place_3":   ([("kenney_interface-sounds", "drop_004.ogg", 0)], 4000, "落子（≥ 3 颗邻子）：低一点的圆润「嘟」，约 0.63 kHz，不闷"),
-    "place_3_b": ([("kenney_interface-sounds", "select_005.ogg", 0)], 4000, "落子第二个变体（≥ 3 颗邻子）：柔和低一点，约 0.57 kHz"),
-    "capture":   ([("kenney_interface-sounds", "pluck_001.ogg", 0)], 4000, "提子落进罐盖：轻快的拨弦「叮」，约 1.7 kHz"),
-    "pick":      ([("kenney_interface-sounds", "tick_004.ogg", 0)], 3500, "罐里取子：很轻的「嗒」"),
     "illegal":   ([("kenney_interface-sounds", "drop_003.ogg", 0)], 3000, "非法点：低一点的软「啵」（不是闷咚）"),
     "pass":      ([("kenney_interface-sounds", "toggle_004.ogg", 0.08), ("kenney_interface-sounds", "toggle_001.ogg", 0)], 4000, "虚手：两下轻快的「嗒嗒」"),
     "score":     ([("kenney_interface-sounds", "glass_005.ogg", 0.07), ("kenney_interface-sounds", "glass_002.ogg", 0.07), ("kenney_interface-sounds", "glass_006.ogg", 0)], 4000, "数目铺方块：三粒清亮的小「叮叮叮」"),
