@@ -1,6 +1,6 @@
 # 九路围棋 Go Nine — project guidance
 
-9 x 9 Go for PICO OS 6 Shared Space, PICO Spatial SDK 6.1.9, package `io.embodit.gonine`, v0.1.6.
+9 x 9 Go for PICO OS 6 Shared Space, PICO Spatial SDK 6.1.9, package `io.embodit.gonine`, v0.1.7.
 Design contract: factory `apps/go-nine/design-package.json` (v1 = A12 main loop; `v2[]` — lessons, SGF, skin 2,
 review, coordinates, one-tap — is NOT built).
 

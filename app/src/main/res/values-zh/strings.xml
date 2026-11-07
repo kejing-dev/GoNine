@@ -103,6 +103,8 @@
     <string name="new_komi">贴目</string>
     <string name="new_komi_handicap">让子局 0.5</string>
     <string name="btn_start">开始</string>
+    <string name="new_confirm_current">这一盘：第 %1$d 手 · %2$s</string>
+    <string name="new_confirm_next">新的一盘：%1$s</string>
 
     <string name="rules_lib_title">气</string>
     <string name="rules_lib_body">子旁边的空点就是它的气，亮点那四个。</string>

@@ -232,10 +232,16 @@ private fun ResultPanel(game: GameState, graph: GoGraph) {
 internal fun NewPage(game: GameState, graph: GoGraph) {
     var draft by remember(game.gameId) { mutableStateOf(game.config) }
     if (game.confirm == Confirm.NEW_GAME) {
-        // The confirmation is a short page of its own: spread evenly (≤ 25 % blank, profile D44).
-        Column(Modifier.fillMaxSize().padding(vertical = 8.dp), verticalArrangement = Arrangement.SpaceEvenly) {
-            Label(stringResource(R.string.tab_new), PicoTheme.typography.headlineSmall, "title/new")
-            PrimaryButton(stringResource(R.string.new_continue, game.moveCount), { graph.flow.cancelConfirm(); ControlNav.page = Page.PLAY }, "new/continue", Modifier.fillMaxWidth(), R.drawable.ic_play_arrow, height = 72.dp)
+        // QA #5 q5-1: four blocks from the top padding to the bottom padding (SpaceBetween), so the blank outside the
+        // content stays ≈ the window padding (≤ 25 % top + bottom) and no gap inside exceeds 20 %.
+        val next = graph.flow.pendingConfig ?: game.config
+        Column(Modifier.fillMaxSize().padding(vertical = 4.dp), verticalArrangement = Arrangement.SpaceBetween) {
+            Label(stringResource(R.string.tab_new), PicoTheme.typography.headlineMedium, "title/new")
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Label(stringResource(R.string.new_confirm_current, game.moveCount, configSummary(game.config)), PicoTheme.typography.titleMedium, "newconfirm/current", maxLines = 2)
+                PrimaryButton(stringResource(R.string.new_continue, game.moveCount), { graph.flow.cancelConfirm(); ControlNav.page = Page.PLAY }, "new/continue", Modifier.fillMaxWidth(), R.drawable.ic_play_arrow, height = 72.dp)
+            }
+            Label(stringResource(R.string.new_confirm_next, configSummary(next)), PicoTheme.typography.titleMedium, "newconfirm/next", maxLines = 2)
             ConfirmBox(Confirm.NEW_GAME, graph)
         }
         return
@@ -275,6 +281,15 @@ internal fun NewPage(game: GameState, graph: GoGraph) {
         PrimaryButton(stringResource(R.string.btn_start), { ControlNav.page = Page.PLAY; graph.flow.requestNewGame(draft); if (graph.flow.current.confirm == Confirm.NEW_GAME) ControlNav.page = Page.NEW }, "new/start", Modifier.fillMaxWidth(), R.drawable.ic_play_arrow)
         Gap(16.dp)
     }
+}
+
+/** 「人机 · 入门 · 让你 2 子 · 贴目 0.5」 / 「双人 · 分先 · 贴目 7.5」 */
+@Composable
+private fun configSummary(c: GameConfig): String {
+    val handicap = if (c.handicap > 0) stringResource(R.string.meta_handicap, c.handicap) else stringResource(R.string.meta_even)
+    val komi = stringResource(R.string.new_komi) + " " + komiText(c.effectiveKomi)
+    return if (c.mode == Mode.VS_AI) listOf(stringResource(R.string.new_vs_ai), levelName(c.level), handicap, komi).joinToString(" · ")
+    else listOf(stringResource(R.string.new_local), handicap, komi).joinToString(" · ")
 }
 
 // ---- rules (S01 / S12) ----

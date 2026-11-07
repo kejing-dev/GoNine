@@ -112,6 +112,8 @@
     <string name="new_komi">Komi</string>
     <string name="new_komi_handicap">Handicap game: 0.5</string>
     <string name="btn_start">Start</string>
+    <string name="new_confirm_current">This game: move %1$d · %2$s</string>
+    <string name="new_confirm_next">New game: %1$s</string>
 
     <!-- S01 / S12 rules -->
     <string name="rules_lib_title">Liberties</string>

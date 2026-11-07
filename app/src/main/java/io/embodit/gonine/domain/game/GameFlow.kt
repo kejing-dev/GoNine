@@ -338,7 +338,9 @@ class GameFlow(
         if (current.inGame && current.moveCount > 0) ask(Confirm.NEW_GAME) else newGame(config)
     }
 
-    private var pendingConfig: GameConfig? = null
+    /** The settings [requestNewGame] is waiting to start (shown on the S13 new-game confirmation). */
+    var pendingConfig: GameConfig? = null
+        private set
 
     private fun ask(c: Confirm) {
         val s = current
